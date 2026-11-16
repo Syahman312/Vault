@@ -264,6 +264,14 @@ function getSS_(create) {
     try { return SpreadsheetApp.openById(id); } catch (e) { if (!create) throw new VaultError('sheet_missing'); }
   }
   if (!create) throw new VaultError('not_setup');
+  // Script opened from a Sheet (Extensions → Apps Script)? Use that Sheet as the index.
+  let bound = null;
+  try { bound = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) {}
+  if (bound) {
+    bound.setSpreadsheetTimeZone('Asia/Kuala_Lumpur');
+    p.setProperty('SHEET_ID', bound.getId());
+    return bound;
+  }
   const ss = SpreadsheetApp.create(CFG.SHEET_NAME);
   ss.setSpreadsheetTimeZone('Asia/Kuala_Lumpur');
   p.setProperty('SHEET_ID', ss.getId());
