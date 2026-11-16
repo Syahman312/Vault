@@ -20,8 +20,11 @@ Allow about 15 minutes. Do the steps in order.
 
 ## 1. Bridge (Apps Script)
 
-1. Go to **script.google.com** → **New project**. Rename it **Vault bridge**.
+1. Open your **Vault Data** Google Sheet (or create a blank one with that name) → **Extensions → Apps Script**.
+   Rename the project (top left) to **Vault bridge**.
+   *(You can also start from script.google.com → New project; `setup` then creates the Sheet for you.)*
 2. Delete the sample code in `Code.gs` and paste the whole of [`apps-script/Code.gs`](apps-script/Code.gs).
+   Easiest copy: open https://raw.githubusercontent.com/Syahman312/Vault/main/apps-script/Code.gs on a PC → Ctrl+A → Ctrl+C.
 3. Click **Project Settings** (gear) → tick **Show "appsscript.json" manifest file in editor**.
    Back in the editor, open `appsscript.json` and replace it with [`apps-script/appsscript.json`](apps-script/appsscript.json).
    This sets the time zone to **Asia/Kuala_Lumpur** and limits access to Drive, Sheets, Calendar and triggers.
@@ -31,7 +34,7 @@ Allow about 15 minutes. Do the steps in order.
    - Open **Execution log**. Copy both keys somewhere safe (a password manager):
      - **APP KEY** (48 characters): what your devices use. Full access.
      - **LINK KEY** (32 characters): read-only, for Garage / Ledger / Flow.
-   - `setup` also creates the Sheet, the Drive folders, the "Vault" calendar and three triggers
+   - `setup` also adds the tabs to the Sheet (or creates it), the Drive folders, the "Vault" calendar and three triggers
      (daily 03:00 job, hourly share revoker, Sheet onEdit). It is safe to run again; it only adds what is missing and never changes the key.
 5. **Deploy** → **New deployment** → type **Web app**
    - Description: `Vault bridge`
