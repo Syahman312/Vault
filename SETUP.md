@@ -85,6 +85,11 @@ On first open:
 2. Create a **6-digit PIN** (asked on every open and after 5 min idle; change it in Settings).
 3. Say **yes** to Face ID / fingerprint if offered.
 
+**What each device gets:**
+- **iPhone / Android phone**: bottom tab bar, camera scanning, Face ID / fingerprint. The tab bar hides while you type, and fields are sized so iOS doesn't zoom in. Landscape works too.
+- **iPad / Android tablet**: wider cards in portrait. In landscape you get a side bar, the file preview next to the details, and a two-column Add form.
+- **PC**: side bar and two-column layouts. **Drag files** onto the window or **paste** an image (Ctrl/⌘+V) to add them. Keyboard: `/` search · `n` add · `b` browse · `e` expiring · `s` settings · `Esc` back.
+
 Each device keeps its own PIN. Forgot it? Tap **Forgot PIN?** and enter the app key to set a new one.
 
 ---

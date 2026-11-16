@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'; worker-src 'self'; manifest-src 'self'">
@@ -67,10 +67,10 @@ nav.tabs a.on{color:var(--accent)}
 nav.tabs a.add .plus{width:44px;height:34px;border-radius:12px;background:var(--accent);color:var(--accentInk);display:grid;place-items:center}
 nav.tabs a.add .plus svg{width:22px;height:22px}
 nav.tabs .badge{position:absolute;top:8px;left:calc(50% + 6px);background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:9px;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px}
-@media (min-width:1000px){
+@media (min-width:900px){
   nav.tabs{top:0;bottom:0;height:100dvh;right:auto;width:92px;border-top:0;border-right:1px solid var(--line);padding:calc(var(--safeT) + 20px) 0 0}
   nav.tabs .tabs-in{grid-template-columns:1fr;grid-auto-rows:78px;height:auto}
-  #app{padding-left:calc(92px + var(--pad));padding-bottom:40px;max-width:calc(860px + 92px)}
+  #app{padding-left:calc(92px + 28px);padding-right:28px;padding-bottom:40px;max-width:calc(1240px + 92px)}
   .toast-wrap{bottom:24px!important}
 }
 
@@ -180,7 +180,7 @@ input[type=date].in{width:100%;min-width:0;max-width:100%}
 .kv{display:grid;grid-template-columns:110px 1fr;gap:10px 12px;align-items:start}
 .kv dt{color:var(--muted);font-size:13px;padding-top:1px}
 .kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
-.num{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.06em;font-size:15px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.num{white-space:nowrap;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.06em;font-size:15px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .num.reveal{color:var(--accent2)}
 .bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
 .bar i{display:block;height:100%;border-radius:99px;background:var(--green)}
@@ -257,6 +257,66 @@ body.locked #app,body.locked nav.tabs,body.locked #viewer{visibility:hidden}
 #saved .door b{position:relative;z-index:1;font-size:46px;color:var(--accent);opacity:0;animation:tick .3s .55s forwards}
 @keyframes door{0%{transform:scale(.6) rotate(-140deg);opacity:0}60%{transform:scale(1.05) rotate(10deg);opacity:1}100%{transform:scale(1) rotate(0)}}
 @keyframes tick{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+/* ---------- devices ---------- */
+/* iOS zooms into any field under 16px — keep inputs at 16px everywhere */
+.in,select.in,textarea.in,input,select,textarea{font-size:16px}
+.filters select,#fSort,#sIdle{font-size:16px}
+button,a,label,.slide{touch-action:manipulation}
+nav.tabs,.top,.pad,.chips,.btn,.chip{-webkit-user-select:none;user-select:none}
+body.kb nav.tabs{display:none}
+body.kb #app{padding-bottom:24px}
+.drop{display:none;margin-top:10px;border:1.5px dashed var(--line2);border-radius:var(--r);padding:18px;text-align:center;color:var(--muted);font-size:13px}
+body.dragging .drop{display:block;border-color:var(--accent);color:var(--accent);background:rgba(201,162,39,.06)}
+@media (hover:hover) and (pointer:fine){
+  .drop{display:block}
+  .item:hover,.cat:hover,.qa:hover,.gcard:hover,.src:hover,.check:hover{background:var(--card2)}
+  .btn:hover{filter:brightness(1.1)}.iconbtn:hover{border-color:var(--line2);background:var(--card2)}
+  nav.tabs a:hover{color:var(--text)}
+  ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:10px;border:2px solid var(--bg)}::-webkit-scrollbar-track{background:transparent}
+}
+/* tablets (iPad portrait, Android tablets) */
+@media (min-width:700px){
+  :root{--pad:24px}
+  #app{max-width:860px}
+  nav.tabs .tabs-in{max-width:620px}
+  .cats{grid-template-columns:repeat(4,1fr)}
+  .gridv{grid-template-columns:repeat(3,1fr)}
+  .slide{height:min(62vh,560px)}
+  .kv{grid-template-columns:130px 1fr}
+  h1{font-size:28px}
+}
+/* iPad landscape, PCs */
+@media (min-width:900px){
+  #app{max-width:calc(1180px + 92px + 28px)}
+  .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 28px;align-items:start}
+  .colR > .section:first-child{margin-top:22px}
+  .cats{grid-template-columns:repeat(3,1fr)}
+  .gridv{grid-template-columns:repeat(4,1fr)}
+  .docgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:start}
+  .docL{position:sticky;top:20px}
+  .docgrid .carousel{margin:0;padding:0}
+  .docgrid .slide{height:calc(100dvh - 140px);max-height:640px}
+  .docgrid .doccard{margin-top:0}
+  .formgrid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:28px;align-items:start}
+  .formL{position:sticky;top:20px}
+  .formR > .grid2:first-child > label.f:first-child,.formR > .grid2:first-child > label.f:last-child{margin-top:0}
+  .setcols{column-count:2;column-gap:24px}
+  .setcols > .section{break-inside:avoid;display:inline-block;width:100%;margin-top:0;margin-bottom:22px}
+  .filters{grid-template-columns:repeat(4,1fr)}
+  .sheet{max-width:600px}
+}
+@media (min-width:1280px){ .gridv{grid-template-columns:repeat(5,1fr)} .cats{grid-template-columns:repeat(4,1fr)} }
+/* phones in landscape */
+@media (max-height:500px) and (orientation:landscape){
+  :root{--tabH:52px}
+  nav.tabs a{flex-direction:row;gap:6px;font-size:12px}
+  nav.tabs a.add .plus{height:30px}
+  .slide{height:70vh}
+  #lock{justify-content:flex-start;overflow:auto}
+}
+.doccard{margin-top:14px}
+.kbd-hint{display:none}
+@media (hover:hover) and (pointer:fine){.kbd-hint{display:block}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
 </style>
 </head>
@@ -288,7 +348,7 @@ body.locked #app,body.locked nav.tabs,body.locked #viewer{visibility:hidden}
    7 browse · 8 document · 9 expiring · 10 add/edit/renew · 11 scan/pdf
    12 viewer · 13 settings · 14 lock · 15 linked apps · 16 boot
    ========================================================================== */
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 
 /* ============================== 1. utils ============================== */
 const $ = (s, r = document) => r.querySelector(s);
@@ -792,18 +852,20 @@ function viewHome() {
   <div id="results"></div>
   <div id="homeBody" class="${q ? 'hidden' : ''}">
   ${soon.length ? `<a class="banner ${overdue ? 'red' : ''}" href="#expiring"><span style="font-size:20px">⚠</span><div class="grow"><b>${overdue ? overdue + ' overdue' + (soon.length > overdue ? ', ' : '') : ''}${soon.length > overdue ? (soon.length - overdue) + ' expiring in 60 days' : ''}</b><div class="small muted ellipsis">${esc(soon.slice().sort((a, b) => daysLeft(a) - daysLeft(b)).slice(0, 3).map(d => d.Title).join(' · '))}</div></div><span class="muted">›</span></a>` : ''}
+  <div class="cols"><div class="colL">
   ${docs.length ? `<div class="section"><button class="card health" id="healthBtn"><div class="ring" style="--v:${h.score}"><b>${h.score}</b></div><div class="grow"><h3>Vault health</h3><div class="small muted">${h.score >= 85 ? 'Looking solid.' : h.score >= 60 ? 'A few things to tidy up.' : 'Needs some attention.'} Tap for details.</div></div></button></div>` : ''}
   <div class="section"><div class="hd"><h2>★ Quick access</h2></div>
     ${pinned.length ? `<div class="quick">${pinned.map(d => `<a class="qa" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category, 1)}<div class="t">${esc(d.Title)}</div>${expiryPill(d)}</a>`).join('')}</div>`
       : `<div class="card small muted">Pin your most-used documents (IC, passport, licence) from the ⋯ menu and they show up here.</div>`}</div>
   ${missing.length ? `<div class="section"><div class="hd"><h2>Checklist</h2><span class="tiny muted">${h.checklist.filter(c => c.done).length}/${h.checklist.length}</span></div><div class="card" style="padding:4px 14px">
     ${missing.map(c => `<a class="check" href="#add?cat=${encodeURIComponent(c.cat)}&title=${encodeURIComponent(c.t)}"><span class="box"></span><span class="grow">Add your ${esc(c.t.replace(/^[A-Z](?=[a-z])/, m => m.toLowerCase()))}</span><span class="muted">+</span></a>`).join('')}</div></div>` : ''}
+  </div><div class="colR">
   <div class="section"><div class="hd"><h2>Recent</h2></div>
     ${recent.length ? `<div class="list">${recent.map(d => `<a class="item" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category, 1)}<div class="grow t ellipsis">${esc(d.Title)}</div><span class="small muted">${esc(ago(d.Updated))}</span></a>`).join('')}</div>`
       : `<div class="card empty"><div class="big">🔐</div>Your vault is empty.<br><a class="btn primary" style="margin-top:14px" href="#add">Add your first document</a></div>`}</div>
   <div class="section"><div class="hd"><h2>Categories</h2></div><div class="cats">
     ${S.cats.map(c => `<a class="cat" href="#browse?cat=${encodeURIComponent(c.Name)}">${catIcon(c.Name, 1)}<div class="n">${esc(c.Name)}</div><div class="c">${counts[c.Name] || 0} doc${counts[c.Name] === 1 ? '' : 's'}</div></a>`).join('')}
-  </div></div></div>`;
+  </div></div></div></div></div>`;
 }
 afterRender.home = () => {
   const q = $('#q');
@@ -853,7 +915,7 @@ function viewBrowse(r) {
     ${sel('fYear', 'Any year', b.year, years)}
   </div>
   <div class="row" style="margin:12px 0 10px"><span class="small muted grow">${docs.length} document${docs.length === 1 ? '' : 's'}</span>
-    <select class="in" id="fSort" style="width:auto;height:36px;font-size:13px"><option value="expiry" ${b.sort === 'expiry' ? 'selected' : ''}>Sort: expiry</option><option value="title" ${b.sort === 'title' ? 'selected' : ''}>Sort: title</option><option value="updated" ${b.sort === 'updated' ? 'selected' : ''}>Sort: updated</option></select></div>
+    <select class="in" id="fSort" style="width:auto;height:38px"><option value="expiry" ${b.sort === 'expiry' ? 'selected' : ''}>Sort: expiry</option><option value="title" ${b.sort === 'title' ? 'selected' : ''}>Sort: title</option><option value="updated" ${b.sort === 'updated' ? 'selected' : ''}>Sort: updated</option></select></div>
   ${!docs.length ? `<div class="card empty"><div class="big">🗂️</div>Nothing here yet.<br><a class="btn primary" style="margin-top:14px" href="#add${b.cat ? '?cat=' + encodeURIComponent(b.cat) : ''}">Add a document</a></div>`
     : b.view === 'grid' ? `<div class="gridv">${docs.map(d => `<a class="gcard" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category)}<div class="t">${d.Pinned ? '★ ' : ''}${esc(d.Title)}${d.Encrypted ? ' 🔒' : ''}</div><div class="small muted ellipsis">${esc(d.Owner || '')}</div><div style="margin-top:auto">${expiryPill(d) || `<span class="tiny dim">${esc(ago(d.Updated))}</span>`}</div></a>`).join('')}</div>`
     : `<div class="list">${docs.map(docItem).join('')}</div>`}`;
@@ -893,11 +955,13 @@ function viewDoc(r) {
   const num = d.DocNumber ? (Crypto.isEnc(d.DocNumber) ? (plainNums[d.ID] ?? null) : d.DocNumber) : '';
   return `${topBar(esc(d.Title), { back: true, extra: `<button class="iconbtn" id="docMenu" aria-label="More">${icons.more}</button>` })}
   ${newer ? `<a class="banner" href="#doc=${encodeURIComponent(newer.ID)}" style="margin:0 0 12px"><span>🗂️</span><div class="grow small">This is a previous version. <b>Open the current one</b></div><span class="muted">›</span></a>` : ''}
+  <div class="docgrid"><div class="docL">
   ${files.length ? `<div class="carousel" id="car">${files.map((f, i) => `<button class="slide" data-i="${i}"><span class="tag">${i + 1}/${files.length}${f.ref ? ' · ref' : ''}${f.enc ? ' · 🔒' : ''}</span>
       <div class="ph"><div class="big">${mimeIcon(f.origMime || f.mime, f.origName || f.name)}</div><div class="small ellipsis" style="max-width:240px">${esc(f.origName || f.name)}</div><div class="tiny dim">${fmtSize(f.size)}${f.pending ? ' · waiting to upload' : ''} · tap to view</div></div></button>`).join('')}</div>
       ${files.length > 1 ? `<div class="dots" id="dots">${files.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}`
     : `<div class="card empty" style="padding:24px"><div class="big">📭</div>No file attached. <a href="#edit=${encodeURIComponent(d.ID)}">Add one</a></div>`}
-  <div class="card" style="margin-top:14px"><dl class="kv" style="margin:0">
+  </div><div class="docR">
+  <div class="card doccard"><dl class="kv" style="margin:0">
     ${d.DocNumber ? `<dt>No.</dt><dd><div class="row">${num === null
       ? `<button class="btn sm" id="unlockNum">🔒 Unlock number</button>`
       : `<span class="num grow" id="num" data-v="${esc(num)}" title="Press and hold to reveal">${esc(maskNumber(num))}</span>
@@ -921,7 +985,8 @@ function viewDoc(r) {
     <a class="btn ${d.ExpiryDate && n !== null && n <= lead ? 'primary' : ''}" href="#renew=${encodeURIComponent(d.ID)}">Renew</a>
     <button class="btn" id="archBtn">${d.Status === 'Archived' ? 'Unarchive' : 'Archive'}</button>
   </div>
-  ${files.some(f => !f.pending) ? `<p class="tiny dim" style="margin-top:14px">Drive: ${files.filter(f => !f.ref).map(f => esc(f.name)).join(', ')}</p>` : ''}`;
+  ${files.some(f => !f.pending) ? `<p class="tiny dim" style="margin-top:14px">Drive: ${files.filter(f => !f.ref).map(f => esc(f.name)).join(', ')}</p>` : ''}
+  </div></div>`;
 }
 afterRender.doc = r => {
   const d = S.docs[r.id]; if (!d) return;
@@ -1126,13 +1191,15 @@ function viewAdd(r) {
   const opt = (list, cur) => list.map(v => `<option ${v === cur ? 'selected' : ''}>${esc(v)}</option>`).join('');
   return `${topBar(title, { back: f.mode !== 'add' })}
   ${f.mode === 'renew' ? `<div class="card small" style="margin-bottom:12px">Renewing <b>${esc(S.docs[f.oldId] ? S.docs[f.oldId].Title : '')}</b>. Upload the new document and set the new expiry — the old one is archived and kept as the previous version, and the calendar reminders move to the new date.</div>` : ''}
-  <form id="docForm" autocomplete="off" onsubmit="return false">
+  <form id="docForm" autocomplete="off" onsubmit="return false"><div class="formgrid"><div class="formL">
   <div class="srcs">
     <button type="button" class="src" id="srcScan"><span class="e">📷</span>Scan</button>
     <button type="button" class="src" id="srcFile"><span class="e">📄</span>File</button>
     <button type="button" class="src" id="srcPhoto"><span class="e">🖼️</span>Photo</button>
   </div>
   <div class="files" id="fileList"></div>
+  <div class="drop" id="dropHint">Drop files here or paste an image</div>
+  </div><div class="formR">
   <div class="grid2">
     <label class="f"><span>Category</span><select class="in" name="Category">${opt(S.cats.map(x => x.Name), d.Category)}${S.cats.some(x => x.Name === d.Category) ? '' : `<option selected>${esc(d.Category)}</option>`}</select></label>
     <label class="f"><span>Owner</span><select class="in" name="Owner">${opt(S.people.map(x => x.Name), d.Owner)}${!d.Owner || S.people.some(x => x.Name === d.Owner) ? '' : `<option selected>${esc(d.Owner)}</option>`}</select></label>
@@ -1168,7 +1235,7 @@ function viewAdd(r) {
     <button type="button" class="btn primary grow" id="saveBtn">${f.mode === 'edit' ? 'Save changes' : 'Save to Drive'}</button>
   </div>
   <p class="tiny dim" style="margin-top:10px">Files go to Drive › Vault/${esc(d.Category)}/${esc((d.IssueDate || todayStr()).slice(0, 4))}/ and are renamed ${esc((d.IssueDate || todayStr()) + '_' + d.Category + '_' + (d.Title || '…') + '_' + d.Owner)}. Max 20 MB each.</p>
-  </form>`;
+  </div></div></form>`;
 }
 function renderFileList() {
   const f = S.form; const el = $('#fileList'); if (!el || !f) return;
@@ -1457,7 +1524,7 @@ function viewSettings() {
   const links = S.meta.links || {};
   const pend = S.outbox.length;
   const set = (t, sub, right, attrs = '') => `<button class="item" ${attrs}><div class="grow"><div class="t">${t}</div>${sub ? `<div class="s">${sub}</div>` : ''}</div>${right || '<span class="muted">›</span>'}</button>`;
-  return `${topBar('Settings')}
+  return `${topBar('Settings')}<div class="setcols">
   <div class="section" style="margin-top:0"><div class="hd"><h2>Bridge</h2></div><div class="list">
     ${set('Status', esc(S.syncErr || (S.lastSync ? 'Synced ' + ago(new Date(S.lastSync).toISOString()) : 'Not synced yet')) + (pend ? ` · ${pend} change${pend > 1 ? 's' : ''} waiting` : ''), '<span class="muted small">Sync</span>', 'id="sSync"')}
     ${set('Run checks', 'Bridge, key, Sheet, Drive, Calendar, triggers, this device', '', 'id="sChecks"')}
@@ -1495,8 +1562,9 @@ function viewSettings() {
   </div></div>
   <div class="section"><div class="hd"><h2>This device</h2></div><div class="list">
     ${set('Forget this device', 'Removes the key, PIN and cached data here. Drive and the Sheet are untouched.', '<span style="color:#FF8A82">⏏</span>', 'id="sForget"')}
-  </div></div>
-  <p class="tiny dim" style="text-align:center;margin-top:18px">Vault ${APP_VERSION} · bridge ${esc(S.meta.version || '?')} · ${docList().length} documents</p>`;
+  </div></div></div>
+  <p class="tiny dim kbd-hint" style="text-align:center;margin-top:18px">Keyboard: / search · n add · b browse · e expiring · s settings · Esc back</p>
+  <p class="tiny dim" style="text-align:center;margin-top:6px">Vault ${APP_VERSION} · bridge ${esc(S.meta.version || '?')} · ${docList().length} documents</p>`;
 }
 afterRender.settings = () => {
   const on = (id, fn) => { const el = $('#' + id); if (el) el.onclick = fn; };
@@ -1886,7 +1954,59 @@ function showConnect(change) {
     } catch (e) { $('#cErr').textContent = errText(e); $('#cGo').disabled = false; $('#cGo').textContent = 'Connect'; }
   };
 }
+/* ---- device helpers: on-screen keyboard, drag & drop, paste, shortcuts ---- */
+const unlockedNow = () => !document.body.classList.contains('locked') && !!S.url;
+function isTyping(el) { return el && (el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'button', 'file', 'color', 'range'].includes(el.type)) || el.isContentEditable); }
+function deviceHelpers() {
+  // hide the tab bar while the phone keyboard is up so it never covers a field
+  const coarse = matchMedia('(pointer:coarse)');
+  document.addEventListener('focusin', e => { if (coarse.matches && isTyping(e.target)) document.body.classList.add('kb'); });
+  document.addEventListener('focusout', () => setTimeout(() => { if (!isTyping(document.activeElement)) document.body.classList.remove('kb'); }, 120));
+
+  // drop or paste files anywhere -> Add form
+  const incoming = async files => {
+    if (!unlockedNow() || !files.length) return;
+    const add = async () => {
+      for (const x of files) {
+        if (/^image\//.test(x.type) && x.size > 1.5 * 1024 * 1024) {
+          try { const out = await compressImage(x); addLocalFile(out, (x.name || 'image').replace(/\.\w+$/, '') + '.jpg', 'image/jpeg'); continue; } catch (e) {}
+        }
+        addLocalFile(x, x.name || ('pasted-' + todayStr() + '.' + ((x.type.split('/')[1] || 'bin').replace('jpeg', 'jpg'))), x.type);
+      }
+      toast(files.length + ' file' + (files.length > 1 ? 's' : '') + ' added');
+    };
+    if (['add', 'edit', 'renew'].includes(parseRoute().view) && S.form) add();
+    else { addEventListener('hashchange', () => setTimeout(add, 0), { once: true }); location.hash = '#add'; }
+  };
+  const hasFiles = e => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+  let depth = 0;
+  addEventListener('dragenter', e => { if (hasFiles(e) && unlockedNow()) { depth++; document.body.classList.add('dragging'); } });
+  addEventListener('dragleave', () => { if (--depth <= 0) { depth = 0; document.body.classList.remove('dragging'); } });
+  addEventListener('dragover', e => { if (hasFiles(e)) e.preventDefault(); });
+  addEventListener('drop', e => { if (!hasFiles(e)) return; e.preventDefault(); depth = 0; document.body.classList.remove('dragging'); incoming(Array.from(e.dataTransfer.files)); });
+  addEventListener('paste', e => { const files = Array.from((e.clipboardData && e.clipboardData.files) || []); if (files.length) { e.preventDefault(); incoming(files); } });
+
+  // keyboard shortcuts (PC, iPad with keyboard)
+  addEventListener('keydown', e => {
+    if (!unlockedNow() || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'Escape') {
+      if ($('#viewer')) return closeViewer();
+      const scrims = $$('.scrim');
+      if (scrims.length) return scrims[scrims.length - 1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      if (['doc', 'edit', 'renew'].includes(parseRoute().view)) return goBack();
+      return;
+    }
+    if (isTyping(e.target) || $('.scrim') || $('#viewer')) return;
+    const go = { '/': '#home', n: '#add', b: '#browse', e: '#expiring', s: '#settings', h: '#home' }[e.key];
+    if (!go) return;
+    e.preventDefault();
+    if (location.hash !== go) location.hash = go;
+    if (e.key === '/') setTimeout(() => { const q = $('#q'); if (q) q.focus(); }, 30);
+  });
+}
+
 async function boot() {
+  deviceHelpers();
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   const cfg = LS.get('cfg', null);
   if (cfg) { S.url = cfg.url; S.key = cfg.key; }
