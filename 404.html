@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Vault</title>
+<style>html,body{margin:0;background:#0B0B0C;color:#8D8D95;font:15px -apple-system,system-ui,sans-serif;display:grid;place-items:center;min-height:100vh}</style>
+<script>
+  // Project pages live at /<repo>/ — send any unknown path back to the app root.
+  var seg = location.pathname.split('/').filter(Boolean);
+  var base = location.hostname.endsWith('github.io') && seg.length ? '/' + seg[0] + '/' : '/';
+  location.replace(base + (location.hash || ''));
+</script></head>
+<body>Redirecting to Vault…</body></html>

@@ -1,0 +1,1904 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'; worker-src 'self'; manifest-src 'self'">
+<meta name="theme-color" content="#0B0B0C">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vault">
+<title>Vault</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+:root{
+  --bg:#0B0B0C;--bg2:#111113;--card:#161618;--card2:#1D1D20;--line:#2A2A2F;--line2:#37373D;
+  --text:#F2F2F3;--muted:#8D8D95;--dim:#5E5E66;
+  --accent:#C9A227;--accent2:#E2C25A;--accentInk:#141006;
+  --red:#E5534B;--amber:#E0A03A;--green:#4CAF7A;--blue:#5B8DEF;
+  --r:16px;--r2:12px;--pad:16px;
+  --safeT:env(safe-area-inset-top,0px);--safeB:env(safe-area-inset-bottom,0px);
+  --tabH:64px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;min-height:100dvh;overflow-x:hidden;overscroll-behavior-y:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+a{color:var(--accent);text-decoration:none}
+a.item,a.qa,a.cat,a.gcard,a.check,a.banner,a.chip,.list a.row{color:var(--text)}
+h1,h2,h3{margin:0;font-weight:650;letter-spacing:-.01em}
+h1{font-size:26px}h2{font-size:17px}h3{font-size:15px}
+.muted{color:var(--muted)}.dim{color:var(--dim)}.small{font-size:13px}.tiny{font-size:11.5px}
+.row{display:flex;align-items:center;gap:10px}.col{display:flex;flex-direction:column;gap:10px}
+.grow{flex:1;min-width:0}.wrap{flex-wrap:wrap}.right{margin-left:auto}
+.ellipsis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hidden{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+
+/* ---------- shell ---------- */
+#app{max-width:760px;margin:0 auto;padding:calc(var(--safeT) + 14px) var(--pad) calc(var(--tabH) + var(--safeB) + 28px)}
+.view{animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.top{display:flex;align-items:center;gap:10px;min-height:44px;margin-bottom:14px}
+.top h1{flex:1;min-width:0}
+.iconbtn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);flex:none}
+.iconbtn:active{transform:scale(.96)}
+.iconbtn svg{width:20px;height:20px}
+.syncdot{width:8px;height:8px;border-radius:50%;background:var(--dim);display:inline-block}
+.syncdot.ok{background:var(--green)}.syncdot.busy{background:var(--accent);animation:pulse 1s infinite}.syncdot.err{background:var(--red)}
+@keyframes pulse{50%{opacity:.35}}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(11,11,12,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-top:1px solid var(--line);padding-bottom:var(--safeB)}
+nav.tabs .tabs-in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);height:var(--tabH)}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:11px;position:relative}
+nav.tabs a svg{width:23px;height:23px}
+nav.tabs a.on{color:var(--accent)}
+nav.tabs a.add .plus{width:44px;height:34px;border-radius:12px;background:var(--accent);color:var(--accentInk);display:grid;place-items:center}
+nav.tabs a.add .plus svg{width:22px;height:22px}
+nav.tabs .badge{position:absolute;top:8px;left:calc(50% + 6px);background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:9px;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px}
+@media (min-width:1000px){
+  nav.tabs{top:0;bottom:0;height:100dvh;right:auto;width:92px;border-top:0;border-right:1px solid var(--line);padding:calc(var(--safeT) + 20px) 0 0}
+  nav.tabs .tabs-in{grid-template-columns:1fr;grid-auto-rows:78px;height:auto}
+  #app{padding-left:calc(92px + var(--pad));padding-bottom:40px;max-width:calc(860px + 92px)}
+  .toast-wrap{bottom:24px!important}
+}
+
+/* ---------- cards / lists ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.card + .card{margin-top:10px}
+.section{margin-top:22px}
+.section > .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.section > .hd h2{font-size:15px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:12px}
+.list{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line);width:100%;text-align:left;min-height:60px}
+.item:first-child{border-top:0}
+.item:active{background:var(--card2)}
+.item .t{font-weight:560}
+.item .s{font-size:12.5px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--card2);border:1px solid var(--line);font-size:12.5px;white-space:nowrap;color:var(--text)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accentInk);font-weight:600}
+.chip .dot{width:8px;height:8px;border-radius:50%}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;margin:0 calc(-1*var(--pad));padding-left:var(--pad);padding-right:var(--pad)}
+.chips::-webkit-scrollbar{display:none}
+.cicon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:19px;flex:none;position:relative}
+.cicon.sm{width:30px;height:30px;border-radius:9px;font-size:15px}
+.pill{font-size:11.5px;font-weight:650;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.pill.red{background:rgba(229,83,75,.16);color:#FF8A82}
+.pill.amber{background:rgba(224,160,58,.16);color:#F2BE6A}
+.pill.green{background:rgba(76,175,122,.15);color:#7BD3A2}
+.pill.grey{background:var(--card2);color:var(--muted)}
+.pill.gold{background:rgba(201,162,39,.16);color:var(--accent2)}
+
+/* ---------- buttons / forms ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 18px;border-radius:13px;background:var(--card2);border:1px solid var(--line2);font-weight:600;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accentInk)}
+.btn.danger{color:#FF8A82;border-color:rgba(229,83,75,.4)}
+.btn.ghost{background:transparent}
+.btn.sm{height:36px;padding:0 12px;font-size:13.5px;border-radius:10px}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btns{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
+label.f{display:block;margin-top:12px}
+label.f > span{display:block;font-size:12.5px;color:var(--muted);margin:0 0 6px 2px}
+.in,select.in,textarea.in{width:100%;height:46px;border-radius:12px;background:var(--bg2);border:1px solid var(--line2);padding:0 13px;outline:none;-webkit-appearance:none;appearance:none}
+textarea.in{height:auto;min-height:84px;padding:11px 13px;resize:vertical}
+select.in{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 20px,calc(100% - 13px) 20px;background-size:5px 5px;background-repeat:no-repeat;padding-right:32px}
+.in:focus{border-color:var(--accent)}
+input[type=date].in{min-width:0;display:block}
+input[type=date].in::-webkit-date-and-time-value{text-align:left}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2 > *{min-width:0}
+input[type=date].in{width:100%;min-width:0;max-width:100%}
+.grid2 > label.f{margin-top:12px}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.toggle:first-child{border-top:0}
+.sw{position:relative;width:48px;height:28px;flex:none}
+.sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.sw i{position:absolute;inset:0;border-radius:99px;background:var(--line2);transition:.2s}
+.sw i::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked + i{background:var(--accent)}
+.sw input:checked + i::after{transform:translateX(20px)}
+
+/* ---------- home ---------- */
+.search{position:relative}
+.search input{height:50px;border-radius:15px;padding-left:44px;background:var(--card);border:1px solid var(--line)}
+.search svg{position:absolute;left:14px;top:15px;width:20px;height:20px;color:var(--muted)}
+.banner{display:flex;align-items:center;gap:12px;margin-top:12px;padding:13px 14px;border-radius:var(--r);background:linear-gradient(90deg,rgba(224,160,58,.14),rgba(224,160,58,.05));border:1px solid rgba(224,160,58,.35);width:100%;text-align:left}
+.banner.red{background:linear-gradient(90deg,rgba(229,83,75,.16),rgba(229,83,75,.05));border-color:rgba(229,83,75,.4)}
+.quick{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(120px,150px);gap:10px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1*var(--pad));padding:0 var(--pad)}
+.quick::-webkit-scrollbar{display:none}
+.qa{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;text-align:left;display:flex;flex-direction:column;gap:8px;min-height:104px}
+.qa .t{font-weight:600;font-size:13.5px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (min-width:560px){.cats{grid-template-columns:repeat(4,1fr)}}
+.cat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 10px;text-align:left;display:flex;flex-direction:column;gap:8px;min-height:96px}
+.cat .n{font-size:12.5px;font-weight:600;line-height:1.2}
+.cat .c{font-size:11.5px;color:var(--muted)}
+.health{display:flex;gap:14px;align-items:center;width:100%;text-align:left}
+.ring{--v:0;width:64px;height:64px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:conic-gradient(var(--accent) calc(var(--v)*1%),var(--line) 0)}
+.ring b{width:52px;height:52px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:17px}
+.check{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);width:100%;text-align:left}
+.check:first-child{border-top:0}
+.check .box{width:22px;height:22px;border-radius:7px;border:1.5px dashed var(--line2);flex:none}
+
+/* ---------- browse ---------- */
+.filters{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+@media (min-width:560px){.filters{grid-template-columns:repeat(4,1fr)}}
+.filters select{height:40px;border-radius:11px;font-size:13.5px}
+.gridv{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:560px){.gridv{grid-template-columns:repeat(3,1fr)}}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;text-align:left;display:flex;flex-direction:column;gap:8px;min-height:130px}
+.gcard .t{font-weight:600;font-size:14px;line-height:1.25}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty .big{font-size:42px;margin-bottom:6px}
+
+/* ---------- document ---------- */
+.carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;scrollbar-width:none;margin:0 calc(-1*var(--pad));padding:0 var(--pad)}
+.carousel::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:center;height:min(58vh,440px);border-radius:var(--r);background:var(--card);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden;position:relative}
+.slide img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.slide .ph{text-align:center;padding:20px;color:var(--muted)}
+.slide .ph .big{font-size:40px}
+.slide .tag{position:absolute;left:10px;top:10px;font-size:11px;background:rgba(0,0,0,.6);padding:3px 8px;border-radius:99px}
+.slide iframe{width:100%;height:100%;border:0;background:#fff}
+.dots{display:flex;justify-content:center;gap:6px;margin-top:8px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--line2)}
+.dots i.on{background:var(--accent)}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:10px 12px;align-items:start}
+.kv dt{color:var(--muted);font-size:13px;padding-top:1px}
+.kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.num{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.06em;font-size:15px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.num.reveal{color:var(--accent2)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--green)}
+.bar.amber i{background:var(--amber)}.bar.red i{background:var(--red)}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.actions .btn{padding:0 8px}
+
+/* ---------- add ---------- */
+.srcs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.src{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:600;font-size:13.5px}
+.src .e{font-size:26px}
+.files{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.fileitem{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px}
+.thumb{width:46px;height:46px;border-radius:9px;background:var(--card2);flex:none;display:grid;place-items:center;overflow:hidden;font-size:20px}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.pages{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.page{position:relative;border-radius:12px;overflow:hidden;background:var(--card2);aspect-ratio:3/4;border:1px solid var(--line)}
+.page img{width:100%;height:100%;object-fit:contain}
+.page .pn{position:absolute;left:6px;top:6px;background:rgba(0,0,0,.65);font-size:11px;padding:2px 7px;border-radius:99px}
+.page .pa{position:absolute;right:4px;bottom:4px;display:flex;gap:4px}
+.page .pa button{width:30px;height:30px;border-radius:9px;background:rgba(0,0,0,.7);display:grid;place-items:center;font-size:14px}
+.progress{height:4px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:8px}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+
+/* ---------- expiring ---------- */
+.timeline{position:relative;padding-left:22px}
+.timeline::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tm{position:relative;margin-bottom:16px}
+.tm::before{content:"";position:absolute;left:-21px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--accent)}
+.tm h3{font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
+
+/* ---------- sheet / modal / toast ---------- */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s}
+@keyframes fadeIn{from{opacity:0}}
+.sheet{width:100%;max-width:560px;max-height:92dvh;overflow:auto;background:var(--bg2);border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;padding:10px var(--pad) calc(var(--safeB) + 18px);animation:up .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+.sheet .grab{width:38px;height:5px;border-radius:9px;background:var(--line2);margin:0 auto 12px}
+.sheet h2{margin-bottom:6px}
+@media (min-width:700px){.scrim{align-items:center}.sheet{border-radius:22px;border-bottom:1px solid var(--line)}}
+.menu .item{min-height:52px}
+.toast-wrap{position:fixed;left:0;right:0;bottom:calc(var(--tabH) + var(--safeB) + 12px);z-index:80;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 16px}
+.toast{background:#26262B;border:1px solid var(--line2);color:var(--text);padding:11px 16px;border-radius:14px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:520px;pointer-events:auto;animation:up .2s}
+.toast.err{border-color:rgba(229,83,75,.5)}
+
+/* ---------- viewer ---------- */
+#viewer{position:fixed;inset:0;z-index:70;background:#000;display:flex;flex-direction:column}
+#viewer .vt{display:flex;gap:8px;align-items:center;padding:calc(var(--safeT) + 8px) 12px 8px;background:rgba(0,0,0,.7)}
+#viewer .vb{flex:1;overflow:hidden;position:relative;touch-action:none;display:grid;place-items:center}
+#viewer .vb img{max-width:100%;max-height:100%;transform-origin:center;will-change:transform;user-select:none;-webkit-user-drag:none}
+#viewer .vb iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+#viewer .vb.pdf{touch-action:auto}
+
+/* ---------- lock / setup ---------- */
+#lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;padding-top:calc(var(--safeT) + 24px)}
+.logo{width:76px;height:76px;margin-bottom:14px}
+.pindots{display:flex;gap:14px;margin:22px 0 26px}
+.pindots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line2)}
+.pindots i.on{background:var(--accent);border-color:var(--accent)}
+.pindots.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+.pad{display:grid;grid-template-columns:repeat(3,76px);gap:14px}
+.pad button{width:76px;height:76px;border-radius:50%;background:var(--card);border:1px solid var(--line);font-size:26px;font-weight:500}
+.pad button:active{background:var(--card2)}
+.pad button.fn{background:transparent;border:0;font-size:15px;color:var(--muted)}
+@media (max-height:600px){.pad{grid-template-columns:repeat(3,62px);gap:10px}.pad button{width:62px;height:62px;font-size:22px}.logo{width:52px;height:52px}}
+body.privacy #app,body.privacy #viewer{filter:blur(24px)}
+body.locked #app,body.locked nav.tabs,body.locked #viewer{visibility:hidden}
+
+/* ---------- save animation ---------- */
+#saved{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(0,0,0,.55);animation:fadeIn .15s;pointer-events:none}
+#saved .door{width:120px;height:120px;border-radius:50%;border:6px solid var(--accent);display:grid;place-items:center;position:relative;animation:door .9s cubic-bezier(.2,.9,.2,1) forwards;background:radial-gradient(circle,#1d1a0e,#0b0b0c)}
+#saved .door::before,#saved .door::after{content:"";position:absolute;width:6px;height:96px;background:var(--accent);border-radius:3px;opacity:.5}
+#saved .door::after{transform:rotate(90deg)}
+#saved .door b{position:relative;z-index:1;font-size:46px;color:var(--accent);opacity:0;animation:tick .3s .55s forwards}
+@keyframes door{0%{transform:scale(.6) rotate(-140deg);opacity:0}60%{transform:scale(1.05) rotate(10deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes tick{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
+</style>
+</head>
+<body class="locked">
+<div id="app" aria-live="polite"></div>
+
+<nav class="tabs hidden" id="tabs" aria-label="Main">
+  <div class="tabs-in">
+    <a href="#home" data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+    <a href="#browse" data-tab="browse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Browse</a>
+    <a href="#add" data-tab="add" class="add"><span class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Add</a>
+    <a href="#expiring" data-tab="expiring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>Expiring<span class="badge hidden" id="expBadge"></span></a>
+    <a href="#settings" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</a>
+  </div>
+</nav>
+
+<div id="lock" class="hidden"></div>
+<div class="toast-wrap" id="toasts"></div>
+<input type="file" id="pickCamera" accept="image/*" capture="environment" class="sr" tabindex="-1">
+<input type="file" id="pickPhoto" accept="image/*" multiple class="sr" tabindex="-1">
+<input type="file" id="pickFile" accept="application/pdf,image/*,.doc,.docx,.xls,.xlsx,.txt" multiple class="sr" tabindex="-1">
+<input type="file" id="pickJson" accept="application/json,.json" class="sr" tabindex="-1">
+
+<script>
+'use strict';
+/* ==========================================================================
+   Vault — single-file PWA. Sections:
+   1 utils · 2 storage · 3 crypto · 4 api/sync · 5 router/render · 6 home
+   7 browse · 8 document · 9 expiring · 10 add/edit/renew · 11 scan/pdf
+   12 viewer · 13 settings · 14 lock · 15 linked apps · 16 boot
+   ========================================================================== */
+const APP_VERSION = '1.0.0';
+
+/* ============================== 1. utils ============================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const uid = (p = 'd') => p + Date.now().toString(36) + Array.from(crypto.getRandomValues(new Uint8Array(4)), b => b.toString(36).padStart(2, '0')).join('').slice(0, 6);
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function parseYMD(s) { if (!/^\d{4}-\d{2}-\d{2}$/.test(s || '')) return null; const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
+function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
+function daysLeft(doc) { const e = parseYMD(doc.ExpiryDate); return e ? daysBetween(parseYMD(todayStr()), e) : null; }
+function fmtDate(s) { const d = parseYMD(s); return d ? d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() : ''; }
+function fmtSize(n) { n = Number(n) || 0; return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(0) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
+function ago(iso) {
+  if (!iso) return '';
+  const s = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (s < 60) return 'just now'; if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago'; if (s < 604800) return Math.floor(s / 86400) + 'd ago';
+  if (s < 2592000) return Math.floor(s / 604800) + 'w ago'; return fmtDate(iso.slice(0, 10));
+}
+function relDays(n) {
+  if (n === null) return '';
+  if (n < 0) return 'expired ' + (-n === 1 ? 'yesterday' : -n + 'd ago');
+  if (n === 0) return 'expires today'; if (n === 1) return 'expires tomorrow';
+  if (n < 60) return n + 'd left'; if (n < 730) return Math.round(n / 30.4) + ' mo left';
+  return (n / 365).toFixed(1).replace('.0', '') + ' yr left';
+}
+function expiryTone(n, lead = 30) { if (n === null) return 'grey'; if (n < 0) return 'red'; if (n <= Math.max(30, lead)) return 'amber'; return 'green'; }
+function b64FromBuf(buf) {
+  const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+  let s = ''; const CH = 0x8000;
+  for (let i = 0; i < bytes.length; i += CH) s += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+  return btoa(s);
+}
+function bufFromB64(b64) { const s = atob(b64); const out = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) out[i] = s.charCodeAt(i); return out; }
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+function download(name, blob) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function maskNumber(n) {
+  n = String(n || ''); if (!n) return '';
+  if (n.length <= 4) return '•'.repeat(n.length);
+  if (n.length <= 6) return '•'.repeat(n.length - 2) + n.slice(-2);
+  return n[0] + '•••••' + n.slice(-4);
+}
+function mimeIcon(m = '', name = '') {
+  if (/pdf/.test(m) || /\.pdf$/i.test(name)) return '📄';
+  if (/^image\//.test(m)) return '🖼️';
+  if (/sheet|excel|xls/.test(m + name)) return '📊';
+  return '📎';
+}
+
+function toast(msg, opts = {}) {
+  const el = document.createElement('div');
+  el.className = 'toast' + (opts.error ? ' err' : '');
+  el.innerHTML = esc(msg) + (opts.action ? ` <button class="btn sm ghost" style="height:28px;color:var(--accent)">${esc(opts.action)}</button>` : '');
+  if (opts.action) $('button', el).onclick = () => { opts.onAction(); el.remove(); };
+  $('#toasts').appendChild(el);
+  setTimeout(() => el.remove(), opts.ms || (opts.action ? 7000 : 3200));
+  return el;
+}
+
+/** Bottom sheet. Returns {el, close}. html may contain [data-close]. */
+function sheet(html, opts = {}) {
+  const scrim = document.createElement('div');
+  scrim.className = 'scrim';
+  scrim.innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
+  const close = (v) => { if (!scrim.isConnected) return; scrim.remove(); opts.onClose && opts.onClose(v); };
+  scrim.addEventListener('click', e => { if (e.target === scrim && !opts.sticky) close(); if (e.target.closest('[data-close]')) close(); });
+  document.body.appendChild(scrim);
+  const first = $('input,select,textarea', scrim); if (first && opts.focus !== false) setTimeout(() => first.focus(), 60);
+  return { el: $('.sheet', scrim), close };
+}
+function ask(title, msg, ok = 'OK', danger = false) {
+  return new Promise(res => {
+    const s = sheet(`<h2>${esc(title)}</h2><p class="muted">${msg}</p>
+      <div class="btns" style="margin-top:16px"><button class="btn" data-v="0">Cancel</button><button class="btn ${danger ? 'danger' : 'primary'}" data-v="1">${esc(ok)}</button></div>`,
+      { onClose: v => res(!!v) });
+    $$('[data-v]', s.el).forEach(b => b.onclick = () => s.close(b.dataset.v === '1'));
+  });
+}
+function askText(title, { label = '', type = 'text', value = '', placeholder = '', note = '', ok = 'OK' } = {}) {
+  return new Promise(res => {
+    const s = sheet(`<h2>${esc(title)}</h2>${note ? `<p class="muted small">${note}</p>` : ''}
+      <label class="f"><span>${esc(label)}</span><input class="in" id="askIn" type="${type}" value="${esc(value)}" placeholder="${esc(placeholder)}" autocomplete="off"></label>
+      <div class="btns" style="margin-top:16px"><button class="btn" data-close>Cancel</button><button class="btn primary" id="askOk">${esc(ok)}</button></div>`,
+      { onClose: v => res(v ?? null) });
+    const go = () => s.close($('#askIn', s.el).value);
+    $('#askOk', s.el).onclick = go;
+    $('#askIn', s.el).onkeydown = e => { if (e.key === 'Enter') go(); };
+  });
+}
+function savedAnimation() {
+  const el = document.createElement('div'); el.id = 'saved';
+  el.innerHTML = '<div class="door"><b>✓</b></div>';
+  document.body.appendChild(el);
+  if (navigator.vibrate) try { navigator.vibrate(18); } catch (e) {}
+  setTimeout(() => el.remove(), 1100);
+}
+
+/* ============================== 2. storage ============================== */
+const LS = {
+  get(k, d = null) { try { const v = localStorage.getItem('vault.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('vault.' + k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem('vault.' + k); } catch (e) {} },
+};
+const DB = {
+  _db: null,
+  open() {
+    if (this._db) return Promise.resolve(this._db);
+    return new Promise((res, rej) => {
+      const r = indexedDB.open('vault', 1);
+      r.onupgradeneeded = () => { const db = r.result; db.createObjectStore('kv'); db.createObjectStore('blobs'); };
+      r.onsuccess = () => { this._db = r.result; res(r.result); };
+      r.onerror = () => rej(r.error);
+    });
+  },
+  async _tx(store, mode, fn) {
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction(store, mode); const st = tx.objectStore(store);
+      let out; const req = fn(st);
+      if (req) req.onsuccess = () => { out = req.result; };
+      tx.oncomplete = () => res(out); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+    });
+  },
+  get(k, store = 'kv') { return this._tx(store, 'readonly', st => st.get(k)); },
+  set(k, v, store = 'kv') { return this._tx(store, 'readwrite', st => st.put(v, k)); },
+  del(k, store = 'kv') { return this._tx(store, 'readwrite', st => st.delete(k)); },
+  keys(store = 'kv') { return this._tx(store, 'readonly', st => st.getAllKeys()); },
+  clear(store) { return this._tx(store, 'readwrite', st => st.clear()); },
+};
+
+/* ============================== 3. crypto ============================== */
+const Crypto = {
+  async pbkdf2Bits(secret, saltBytes, iterations, bits = 256) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), 'PBKDF2', false, ['deriveBits', 'deriveKey']);
+    return new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: saltBytes, iterations }, base, bits));
+  },
+  async deriveAes(pass, saltB64) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt: bufFromB64(saltB64), iterations: 310000 },
+      base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  },
+  async encrypt(key, buf) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, buf));
+    const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12); return out;
+  },
+  async decrypt(key, buf) {
+    const b = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+    return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b.subarray(0, 12) }, key, b.subarray(12)));
+  },
+  async encText(key, s) { return 'enc1:' + b64FromBuf(await this.encrypt(key, new TextEncoder().encode(s))); },
+  async decText(key, s) { return new TextDecoder().decode(await this.decrypt(key, bufFromB64(String(s).slice(5)))); },
+  isEnc(s) { return /^enc1:/.test(s || ''); },
+  async sha256Hex(s) { return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))), b => b.toString(16).padStart(2, '0')).join(''); },
+};
+
+/* ============================== 4. api / sync ============================== */
+const S = {
+  url: '', key: '', docs: {}, cats: [], people: [], meta: {}, since: '', outbox: [],
+  lastSync: 0, syncing: false, syncErr: '', retryIn: 0, encKey: null, form: null, files: new Map(),
+  ui: LS.get('ui', { browse: { cat: '', owner: '', status: 'live', tag: '', year: '', sort: 'expiry', view: 'list' } }),
+};
+class ApiError extends Error { constructor(code, detail) { super(code); this.code = code; this.detail = detail; } }
+const ERRORS = {
+  unauthorized: 'Wrong app key.', locked: 'Bridge locked after too many wrong keys. Run unlock() in Apps Script.',
+  rate_limited: 'Too many requests — wait a minute.', not_setup: 'Run setup() in the Apps Script editor first.',
+  busy: 'Bridge is busy, retrying…', network: 'Offline or bridge unreachable.', too_large: 'File is larger than 20 MB.',
+  encrypted_file: 'Encrypted files cannot be shared by link — use "Share file" instead.', timeout: 'The bridge took too long.',
+};
+const errText = e => ERRORS[e && e.code] || (e && (e.detail || e.message)) || 'Something went wrong';
+
+async function api(action, payload = {}, { timeout = 90000, url, key } = {}) {
+  const target = url || S.url; if (!target) throw new ApiError('no_url');
+  const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), timeout);
+  let res;
+  try {
+    res = await fetch(target, {
+      method: 'POST', redirect: 'follow', signal: ctrl.signal, cache: 'no-store', credentials: 'omit',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(Object.assign({}, payload, { action, key: key || S.key, appUrl: url ? undefined : location.origin + location.pathname })),
+    });
+  } catch (e) { throw new ApiError(e.name === 'AbortError' ? 'timeout' : 'network'); }
+  finally { clearTimeout(t); }
+  let j; try { j = await res.json(); } catch (e) { throw new ApiError('bad_response', 'Bridge returned non-JSON (is the deployment set to "Anyone"?)'); }
+  if (!j.ok) throw new ApiError(j.error || 'error', j.detail);
+  return j;
+}
+const isNetErr = e => e && ['network', 'timeout', 'busy', 'rate_limited', 'bad_response'].includes(e.code);
+
+async function loadCache() {
+  const c = await DB.get('state').catch(() => null);
+  if (c) Object.assign(S, { docs: c.docs || {}, cats: c.cats || [], people: c.people || [], meta: c.meta || {}, since: c.since || '', outbox: c.outbox || [] });
+}
+const persist = debounce(() => DB.set('state', { docs: S.docs, cats: S.cats, people: S.people, meta: S.meta, since: S.since, outbox: S.outbox }).catch(console.error), 250);
+function persistNow() { return DB.set('state', { docs: S.docs, cats: S.cats, people: S.people, meta: S.meta, since: S.since, outbox: S.outbox }); }
+
+let backoff = 0, retryTimer = null;
+function scheduleRetry() {
+  clearTimeout(retryTimer);
+  const steps = [5, 15, 45, 120, 300];
+  const secs = steps[Math.min(backoff, steps.length - 1)]; backoff++;
+  S.retryIn = secs; retryTimer = setTimeout(() => sync(), secs * 1000);
+}
+function setSyncDot() { const d = $('#syncDot'); if (d) d.className = 'syncdot ' + (S.syncing ? 'busy' : S.syncErr ? 'err' : S.lastSync ? 'ok' : ''); }
+
+async function sync({ full = false, quiet = true } = {}) {
+  if (!S.url || S.syncing) return;
+  S.syncing = true; setSyncDot();
+  try {
+    await flushOutbox();
+    const since = full || !S.since ? '' : new Date(new Date(S.since).getTime() - 120000).toISOString();
+    const r = await api('sync', { since });
+    const pending = new Set(S.outbox.map(o => o.docId));
+    if (r.full) { const keep = {}; for (const id of pending) if (S.docs[id]) keep[id] = S.docs[id]; S.docs = keep; }
+    r.docs.forEach(d => { if (!pending.has(d.ID)) S.docs[d.ID] = d; });
+    r.deleted.forEach(id => { if (!pending.has(id)) delete S.docs[id]; });
+    if (r.allIds) { const all = new Set(r.allIds); Object.keys(S.docs).forEach(id => { if (!all.has(id) && !pending.has(id)) delete S.docs[id]; }); }
+    S.cats = r.categories; S.people = r.people; S.meta = r.meta; S.since = r.meta.serverTime;
+    S.lastSync = Date.now(); S.syncErr = ''; backoff = 0; clearTimeout(retryTimer);
+    await persistNow();
+    snapshotMaybe();
+    updateBadge();
+    render();
+    if (!quiet) toast('Synced');
+  } catch (e) {
+    S.syncErr = errText(e);
+    if (isNetErr(e)) scheduleRetry();
+    else if (!quiet || ['unauthorized', 'locked', 'not_setup'].includes(e.code)) toast(S.syncErr, { error: true });
+  } finally { S.syncing = false; setSyncDot(); }
+}
+
+/* ---- outbox: every write goes through here so it works offline ---- */
+function queue(op) {
+  op.id = uid('o'); op.tries = 0;
+  S.outbox.push(op); persist();
+  flushOutbox().then(() => render()).catch(() => {});
+}
+let flushing = null;
+function flushOutbox() {
+  if (flushing) return flushing;
+  flushing = (async () => {
+    while (S.outbox.length) {
+      const op = S.outbox[0];
+      try {
+        await runOp(op);
+        S.outbox.shift(); persist();
+      } catch (e) {
+        if (isNetErr(e)) { S.syncErr = errText(e); scheduleRetry(); throw e; }
+        op.tries++; op.error = errText(e);
+        if (op.tries >= 4) { S.outbox.shift(); toast('Could not save "' + (op.title || 'document') + '": ' + op.error, { error: true, ms: 8000 }); }
+        persist();
+        if (op.tries < 4) throw e;
+      }
+    }
+  })().finally(() => { flushing = null; setSyncDot(); });
+  return flushing;
+}
+async function runOp(op) {
+  if (op.op === 'save' || op.op === 'renew') {
+    const doc = S.docs[op.docId] ? Object.assign({}, S.docs[op.docId]) : op.doc;
+    doc.Files = await uploadPending(doc.Files || [], op);
+    const r = op.op === 'renew' ? await api('renewDoc', { oldId: op.oldId, doc: stripLocal(doc) }) : await api('saveDoc', { doc: stripLocal(doc) });
+    const saved = op.op === 'renew' ? r.doc : r.doc;
+    S.docs[saved.ID] = saved;
+    if (r.old) S.docs[r.old.ID] = r.old;
+    (op.cleanup || []).forEach(k => DB.del(k, 'blobs').catch(() => {}));
+    if (op.flowTask) createFlowTask(saved).catch(() => {});
+  } else if (op.op === 'delete') {
+    await api('deleteDoc', { id: op.docId });
+  }
+}
+function stripLocal(d) { const o = Object.assign({}, d); delete o._local; return o; }
+
+/** Upload any file entries still marked {pending:<blobKey>}; replaces them with Drive refs. */
+async function uploadPending(files, op) {
+  const out = [];
+  for (const f of files) {
+    if (!f.pending) { out.push(f); continue; }
+    const rec = await DB.get(f.pending, 'blobs');
+    if (!rec) continue; // lost (e.g. storage cleared) — drop the entry
+    const up = await uploadBlob(rec.blob, f.name, f.enc ? 'application/octet-stream' : f.mime, p => setUploadProgress(op, f, p));
+    // keep a local copy so the preview opens instantly
+    S.files.set(up.driveId, { blob: rec.blob, mime: up.mime });
+    if (LS.get('keepOffline', false)) DB.set('file:' + up.driveId, { blob: rec.blob, mime: up.mime, at: Date.now() }, 'blobs').catch(() => {});
+    const nf = { driveId: up.driveId, name: up.name, mime: f.enc ? 'application/octet-stream' : f.mime, size: up.size, page: f.page || 0, enc: !!f.enc, origMime: f.mime, origName: f.name };
+    out.push(nf);
+    // persist progress so a retry does not upload twice
+    const live = S.docs[op.docId];
+    if (live) { live.Files = live.Files.map(x => x.pending === f.pending ? nf : x); persist(); }
+    (op.cleanup = op.cleanup || []).push(f.pending);
+  }
+  return out;
+}
+let uploadToast = null;
+function setUploadProgress(op, f, p) {
+  if (!uploadToast || !uploadToast.isConnected) { uploadToast = toast('Uploading…', { ms: 600000 }); }
+  uploadToast.textContent = `Uploading ${f.name} — ${Math.round(p * 100)}%`;
+  if (p >= 1) setTimeout(() => uploadToast && uploadToast.remove(), 600);
+}
+const CHUNK = 3 * 1024 * 1024;
+async function uploadBlob(blob, name, mime, onProgress = () => {}) {
+  if (blob.size > 20 * 1024 * 1024) throw new ApiError('too_large');
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  const total = Math.max(1, Math.ceil(bytes.length / CHUNK));
+  const uploadId = uid('u');
+  let r;
+  for (let i = 0; i < total; i++) {
+    const part = bytes.subarray(i * CHUNK, (i + 1) * CHUNK);
+    for (let attempt = 0; ; attempt++) {
+      try { r = await api('uploadChunk', { uploadId, index: i, total, size: bytes.length, name, mime, data: b64FromBuf(part) }, { timeout: 180000 }); break; }
+      catch (e) { if (!isNetErr(e) || attempt >= 2) throw e; await sleep(2000 * (attempt + 1)); }
+    }
+    onProgress((i + 1) / total);
+  }
+  return r.file;
+}
+
+/** Fetches a vault file (memory → IndexedDB → bridge) and decrypts if needed. Returns {blob, mime}. */
+async function getFile(f) {
+  if (f.pending) { const rec = await DB.get(f.pending, 'blobs'); if (!rec) throw new Error('Local file missing'); return { blob: rec.blob, mime: f.mime }; }
+  let got = S.files.get(f.driveId);
+  if (!got) {
+    const cached = await DB.get('file:' + f.driveId, 'blobs').catch(() => null);
+    if (cached) got = cached;
+  }
+  if (!got) {
+    const parts = []; let offset = 0, size = 1, mime = f.mime;
+    while (offset < size) {
+      const r = await api('fileGet', { driveId: f.driveId, offset }, { timeout: 120000 });
+      size = r.size; mime = r.mime; const b = bufFromB64(r.data); parts.push(b); offset += b.length;
+      if (!b.length) break;
+    }
+    got = { blob: new Blob(parts, { type: f.enc ? 'application/octet-stream' : (f.mime || mime) }), mime: f.mime || mime };
+    if (LS.get('keepOffline', false)) DB.set('file:' + f.driveId, Object.assign({ at: Date.now() }, got), 'blobs').catch(() => {});
+  }
+  S.files.set(f.driveId, got);
+  if (f.enc) {
+    const key = await needEncKey(); if (!key) throw new Error('Passphrase needed');
+    const plain = await Crypto.decrypt(key, await got.blob.arrayBuffer()).catch(() => { throw new Error('Wrong passphrase or damaged file'); });
+    return { blob: new Blob([plain], { type: f.origMime || 'application/octet-stream' }), mime: f.origMime };
+  }
+  return got;
+}
+
+function snapshotMaybe() {
+  const key = 'snap:' + todayStr();
+  DB.get(key).then(async have => {
+    if (have) return;
+    await DB.set(key, { at: new Date().toISOString(), docs: S.docs, cats: S.cats, people: S.people });
+    const keys = (await DB.keys()).filter(k => String(k).startsWith('snap:')).sort();
+    for (const k of keys.slice(0, Math.max(0, keys.length - 14))) await DB.del(k);
+  }).catch(() => {});
+}
+/* ============================== 5. router / render ============================== */
+const catOf = name => S.cats.find(c => c.Name === name) || { Name: name || 'Uncategorised', Icon: '📁', Colour: '#9AA0A6', LeadDays: 30, Fields: '' };
+const personOf = name => S.people.find(p => p.Name === name) || { Name: name, Colour: '#9AA0A6' };
+const docList = () => Object.values(S.docs);
+const leadOf = d => d.RenewalLeadDays !== '' && d.RenewalLeadDays !== undefined && d.RenewalLeadDays !== null && !isNaN(d.RenewalLeadDays) ? Number(d.RenewalLeadDays) : Number(catOf(d.Category).LeadDays || 30);
+const statusOf = d => d.Status === 'Archived' ? 'Archived' : (daysLeft(d) !== null && daysLeft(d) < 0 ? 'Expired' : 'Active');
+const isLive = d => statusOf(d) !== 'Archived';
+function catIcon(name, sm) { const c = catOf(name); return `<span class="cicon${sm ? ' sm' : ''}" style="background:${esc(c.Colour)}22;color:${esc(c.Colour)}">${esc(c.Icon || '📁')}</span>`; }
+function expiryPill(d) {
+  const n = daysLeft(d); if (n === null) return statusOf(d) === 'Archived' ? '<span class="pill grey">Archived</span>' : '';
+  if (statusOf(d) === 'Archived') return '<span class="pill grey">Archived</span>';
+  return `<span class="pill ${expiryTone(n, leadOf(d))}">${esc(relDays(n))}</span>`;
+}
+function docItem(d) {
+  const sub = [d.Owner, d.Category, d.ExpiryDate ? 'exp ' + fmtDate(d.ExpiryDate) : ''].filter(Boolean).map(esc).join(' · ');
+  return `<a class="item" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category)}
+    <div class="grow"><div class="t ellipsis">${d.Pinned ? '★ ' : ''}${esc(d.Title)}${d.Encrypted ? ' 🔒' : ''}${d._local ? ' <span class="pill gold">pending</span>' : ''}</div><div class="s ellipsis">${sub}</div></div>${expiryPill(d)}</a>`;
+}
+function parseRoute() {
+  const raw = decodeURIComponent(location.hash.slice(1)) || 'home';
+  const [path, qs] = raw.split('?');
+  const params = Object.fromEntries(new URLSearchParams(qs || ''));
+  const m = path.match(/^(doc|edit|renew)=(.+)$/);
+  return m ? { view: m[1], id: m[2], params } : { view: path || 'home', params };
+}
+const icons = {
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  more: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  sync: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16M3 12a9 9 0 0 1 15.5-6.3L21 8M21 3v5h-5M3 21v-5h5"/></svg>',
+  eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>',
+  grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+  list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+};
+let lastTab = 'home';
+function render(opts = {}) {
+  if (document.body.classList.contains('locked') || !S.url) return;
+  while (objectUrls.length) URL.revokeObjectURL(objectUrls.pop());
+  renderGen++;
+  const r = parseRoute();
+  const app = $('#app');
+  const keepScroll = app.dataset.route === location.hash;
+  const y = window.scrollY;
+  const views = { home: viewHome, browse: viewBrowse, add: viewAdd, expiring: viewExpiring, settings: viewSettings, doc: viewDoc, edit: viewAdd, renew: viewAdd };
+  const fn = views[r.view] || viewHome;
+  if (['home', 'browse', 'add', 'expiring', 'settings'].includes(r.view)) lastTab = r.view;
+  $$('#tabs a').forEach(a => a.classList.toggle('on', a.dataset.tab === lastTab));
+  // don't wipe a form the user is typing in when a background sync finishes
+  if (!opts.force && keepScroll && ['add', 'edit', 'renew'].includes(r.view) && app.querySelector('#docForm')) { refreshFormBits(); return; }
+  app.innerHTML = `<div class="view">${fn(r)}</div>`;
+  app.dataset.route = location.hash;
+  const after = afterRender[r.view]; if (after) after(r);
+  if (keepScroll) window.scrollTo(0, y); else window.scrollTo(0, 0);
+  setSyncDot();
+}
+const afterRender = {};
+let renderGen = 0;
+const navStack = [location.hash];
+window.addEventListener('hashchange', () => {
+  if (navStack.length > 1 && navStack[navStack.length - 2] === location.hash) navStack.pop(); else navStack.push(location.hash);
+  if (navStack.length > 50) navStack.shift();
+  closeViewer(); render();
+});
+
+function topBar(title, { back = false, extra = '' } = {}) {
+  return `<div class="top">${back ? `<button class="iconbtn" onclick="goBack()" aria-label="Back">${icons.back}</button>` : ''}
+    <h1 class="ellipsis">${title}</h1>${extra}
+    <button class="iconbtn" onclick="sync({quiet:false})" aria-label="Sync now" title="Sync"><span id="syncDot" class="syncdot"></span></button></div>`;
+}
+function goBack() { if (navStack.length > 1) history.back(); else location.hash = '#' + lastTab; }
+
+/* ============================== 6. home ============================== */
+const CHECKLIST = [
+  { t: 'IC (MyKad)', cat: 'Identity', re: /\b(ic|mykad|identity card|kad pengenalan|nric)\b/i },
+  { t: 'Passport', cat: 'Travel', re: /pass?port/i },
+  { t: 'Driving licence', cat: 'Identity', re: /licen[cs]e|lesen|cdl/i },
+  { t: 'Car grant (VOC)', cat: 'Vehicle', re: /grant|geran|voc|ownership/i },
+  { t: 'Road tax', cat: 'Vehicle', re: /road ?tax|cukai jalan|lkm/i },
+  { t: 'Car insurance', cat: 'Insurance', re: /(car|motor|kereta|vehicle)/i },
+  { t: 'Medical card', cat: 'Medical', re: /medical|takaful|health|card/i },
+  { t: 'EA form', cat: 'Finance & Tax', re: /\bea\b|borang ea|ea form/i },
+  { t: 'Tax e-Filing (BE)', cat: 'Finance & Tax', re: /e-?filing|\bbe\b|lhdn|tax return/i },
+  { t: 'ACCA certificate', cat: 'Education (ACCA)', re: /acca|certificate|transcript|result/i },
+  { t: 'Employment letter', cat: 'Employment', re: /offer|appointment|employment|contract/i },
+  { t: 'Marriage certificate', cat: 'Wedding', re: /marriage|nikah|kahwin|wedding/i },
+];
+function checklistState() {
+  const docs = docList();
+  const first = s => s.toLowerCase().split(/[\s(]/)[0];
+  return CHECKLIST.map(c => ({
+    ...c,
+    done: docs.some(d => (d.Category === c.cat && c.re.test(d.Title + ' ' + d.Tags)) ||
+      (d.Title || '').toLowerCase().includes(first(c.t)) && first(c.t).length > 3),
+  }));
+}
+function health() {
+  const docs = docList().filter(isLive);
+  const overdue = docs.filter(d => daysLeft(d) !== null && daysLeft(d) < 0).length;
+  const expiryCats = ['Identity', 'Travel', 'Vehicle', 'Insurance', 'Warranty & Receipts', 'Medical'];
+  const shouldExpire = docs.filter(d => expiryCats.includes(d.Category) && !/\b(ic|mykad|grant|geran|receipt)\b/i.test(d.Title));
+  const withExpiry = shouldExpire.filter(d => d.ExpiryDate).length;
+  const lb = S.meta.lastBackup ? (Date.now() - new Date(S.meta.lastBackup).getTime()) / 3600000 : Infinity;
+  const cl = checklistState(); const clDone = cl.filter(c => c.done).length;
+  const parts = [
+    { name: 'Nothing overdue', pts: Math.max(0, 40 - overdue * 15), max: 40, note: overdue ? overdue + ' overdue' : 'all current' },
+    { name: 'Expiry dates set', pts: shouldExpire.length ? Math.round(25 * withExpiry / shouldExpire.length) : 25, max: 25, note: shouldExpire.length ? `${withExpiry}/${shouldExpire.length} docs` : 'n/a' },
+    { name: 'Backup in last 48 h', pts: lb <= 48 ? 20 : lb <= 24 * 7 ? 10 : 0, max: 20, note: S.meta.lastBackup ? ago(S.meta.lastBackup) : 'never' },
+    { name: 'Common docs added', pts: Math.round(15 * clDone / cl.length), max: 15, note: `${clDone}/${cl.length}` },
+  ];
+  return { score: docs.length ? parts.reduce((a, p) => a + p.pts, 0) : 0, parts, checklist: cl };
+}
+function dueSoon(days) { return docList().filter(d => isLive(d) && daysLeft(d) !== null && daysLeft(d) <= days); }
+function updateBadge() {
+  const n = dueSoon(30).length;
+  const b = $('#expBadge'); if (b) { b.textContent = n; b.classList.toggle('hidden', !n); }
+  try { if (navigator.setAppBadge) n ? navigator.setAppBadge(n) : navigator.clearAppBadge(); } catch (e) {}
+}
+function searchDocs(q) {
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!terms.length) return [];
+  return docList().map(d => {
+    const hay = [d.Title, d.Category, d.Owner, d.Issuer, d.Tags, d.Notes, Crypto.isEnc(d.DocNumber) ? '' : d.DocNumber, Object.values(d.Extra || {}).join(' '), d.ExpiryDate, (d.Files || []).map(f => f.origName || f.name).join(' ')].join(' ').toLowerCase();
+    if (!terms.every(t => hay.includes(t))) return null;
+    let score = terms.reduce((a, t) => a + (d.Title.toLowerCase().includes(t) ? 3 : 1), 0) + (isLive(d) ? 1 : 0);
+    return { d, score };
+  }).filter(Boolean).sort((a, b) => b.score - a.score).slice(0, 30).map(x => x.d);
+}
+function viewHome() {
+  const docs = docList();
+  const soon = dueSoon(60);
+  const overdue = soon.filter(d => daysLeft(d) < 0).length;
+  const h = health();
+  const pinned = docs.filter(d => d.Pinned && isLive(d)).sort((a, b) => a.Title.localeCompare(b.Title));
+  const recent = docs.slice().sort((a, b) => (b.Updated || '').localeCompare(a.Updated || '')).slice(0, 5);
+  const counts = {}; docs.filter(isLive).forEach(d => counts[d.Category] = (counts[d.Category] || 0) + 1);
+  const missing = h.checklist.filter(c => !c.done).slice(0, 3);
+  const q = S.ui.q || '';
+  return `${topBar('Vault')}
+  <div class="search">${icons.search}<input class="in" id="q" type="search" placeholder="Search everything" value="${esc(q)}" autocomplete="off" enterkeyhint="search"></div>
+  <div id="results"></div>
+  <div id="homeBody" class="${q ? 'hidden' : ''}">
+  ${soon.length ? `<a class="banner ${overdue ? 'red' : ''}" href="#expiring"><span style="font-size:20px">⚠</span><div class="grow"><b>${overdue ? overdue + ' overdue' + (soon.length > overdue ? ', ' : '') : ''}${soon.length > overdue ? (soon.length - overdue) + ' expiring in 60 days' : ''}</b><div class="small muted ellipsis">${esc(soon.slice().sort((a, b) => daysLeft(a) - daysLeft(b)).slice(0, 3).map(d => d.Title).join(' · '))}</div></div><span class="muted">›</span></a>` : ''}
+  ${docs.length ? `<div class="section"><button class="card health" id="healthBtn"><div class="ring" style="--v:${h.score}"><b>${h.score}</b></div><div class="grow"><h3>Vault health</h3><div class="small muted">${h.score >= 85 ? 'Looking solid.' : h.score >= 60 ? 'A few things to tidy up.' : 'Needs some attention.'} Tap for details.</div></div></button></div>` : ''}
+  <div class="section"><div class="hd"><h2>★ Quick access</h2></div>
+    ${pinned.length ? `<div class="quick">${pinned.map(d => `<a class="qa" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category, 1)}<div class="t">${esc(d.Title)}</div>${expiryPill(d)}</a>`).join('')}</div>`
+      : `<div class="card small muted">Pin your most-used documents (IC, passport, licence) from the ⋯ menu and they show up here.</div>`}</div>
+  ${missing.length ? `<div class="section"><div class="hd"><h2>Checklist</h2><span class="tiny muted">${h.checklist.filter(c => c.done).length}/${h.checklist.length}</span></div><div class="card" style="padding:4px 14px">
+    ${missing.map(c => `<a class="check" href="#add?cat=${encodeURIComponent(c.cat)}&title=${encodeURIComponent(c.t)}"><span class="box"></span><span class="grow">Add your ${esc(c.t.replace(/^[A-Z](?=[a-z])/, m => m.toLowerCase()))}</span><span class="muted">+</span></a>`).join('')}</div></div>` : ''}
+  <div class="section"><div class="hd"><h2>Recent</h2></div>
+    ${recent.length ? `<div class="list">${recent.map(d => `<a class="item" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category, 1)}<div class="grow t ellipsis">${esc(d.Title)}</div><span class="small muted">${esc(ago(d.Updated))}</span></a>`).join('')}</div>`
+      : `<div class="card empty"><div class="big">🔐</div>Your vault is empty.<br><a class="btn primary" style="margin-top:14px" href="#add">Add your first document</a></div>`}</div>
+  <div class="section"><div class="hd"><h2>Categories</h2></div><div class="cats">
+    ${S.cats.map(c => `<a class="cat" href="#browse?cat=${encodeURIComponent(c.Name)}">${catIcon(c.Name, 1)}<div class="n">${esc(c.Name)}</div><div class="c">${counts[c.Name] || 0} doc${counts[c.Name] === 1 ? '' : 's'}</div></a>`).join('')}
+  </div></div></div>`;
+}
+afterRender.home = () => {
+  const q = $('#q');
+  const run = () => {
+    S.ui.q = q.value; const v = q.value.trim();
+    $('#homeBody').classList.toggle('hidden', !!v);
+    const res = searchDocs(v);
+    $('#results').innerHTML = v ? (res.length ? `<div class="list" style="margin-top:12px">${res.map(docItem).join('')}</div>` : `<div class="empty">No match for “${esc(v)}”.</div>`) : '';
+  };
+  q.addEventListener('input', debounce(run, 80)); if (q.value) run();
+  const hb = $('#healthBtn'); if (hb) hb.onclick = showHealth;
+};
+function showHealth() {
+  const h = health();
+  sheet(`<h2>Vault health · ${h.score}/100</h2>
+    <div style="margin-top:10px">${h.parts.map(p => `<div class="toggle"><div class="grow"><div>${esc(p.name)}</div><div class="small muted">${esc(p.note)}</div></div><b style="color:${p.pts === p.max ? 'var(--green)' : 'var(--amber)'}">${p.pts}/${p.max}</b></div>`).join('')}</div>
+    <h3 style="margin-top:16px">Common documents</h3>
+    <div style="margin-top:6px">${h.checklist.map(c => `<a class="check" href="#add?cat=${encodeURIComponent(c.cat)}&title=${encodeURIComponent(c.t)}" data-close>${c.done ? '<span style="width:22px;text-align:center;color:var(--green)">✓</span>' : '<span class="box"></span>'}<span class="grow ${c.done ? 'muted' : ''}">${esc(c.t)}</span></a>`).join('')}</div>
+    <button class="btn block" style="margin-top:14px" data-close>Close</button>`);
+}
+
+/* ============================== 7. browse ============================== */
+function viewBrowse(r) {
+  const b = S.ui.browse;
+  if (r.params.cat !== undefined) { b.cat = r.params.cat; history.replaceState(null, '', '#browse'); }
+  const all = docList();
+  const tags = [...new Set(all.flatMap(d => String(d.Tags || '').split(',').map(t => t.trim()).filter(Boolean)))].sort();
+  const years = [...new Set(all.map(d => (d.IssueDate || d.Created || '').slice(0, 4)).filter(Boolean))].sort().reverse();
+  let docs = all.filter(d => (!b.cat || d.Category === b.cat) && (!b.owner || d.Owner === b.owner) &&
+    (!b.status || (b.status === 'live' ? isLive(d) : statusOf(d) === b.status)) &&
+    (!b.tag || String(d.Tags).split(',').map(t => t.trim()).includes(b.tag)) &&
+    (!b.year || (d.IssueDate || d.Created || '').startsWith(b.year)));
+  const sorts = {
+    expiry: (x, y) => (x.ExpiryDate || '9999').localeCompare(y.ExpiryDate || '9999') || x.Title.localeCompare(y.Title),
+    title: (x, y) => x.Title.localeCompare(y.Title),
+    updated: (x, y) => (y.Updated || '').localeCompare(x.Updated || ''),
+  };
+  docs.sort(sorts[b.sort] || sorts.expiry);
+  const sel = (id, label, cur, opts) => `<select class="in" id="${id}" aria-label="${label}"><option value="">${label}</option>${opts.map(o => { const [v, t] = Array.isArray(o) ? o : [o, o]; return `<option value="${esc(v)}" ${cur === v ? 'selected' : ''}>${esc(t)}</option>`; }).join('')}</select>`;
+  return `${topBar('Browse', { extra: `<button class="iconbtn" id="viewToggle" aria-label="Toggle grid">${b.view === 'grid' ? icons.list : icons.grid}</button>` })}
+  <div class="chips"><button class="chip ${!b.cat ? 'on' : ''}" data-cat="">All <span class="tiny">${all.filter(isLive).length}</span></button>
+    ${S.cats.map(c => `<button class="chip ${b.cat === c.Name ? 'on' : ''}" data-cat="${esc(c.Name)}"><span>${esc(c.Icon)}</span>${esc(c.Name)}</button>`).join('')}</div>
+  <div class="filters">
+    ${sel('fOwner', 'Anyone', b.owner, S.people.map(p => p.Name))}
+    ${sel('fStatus', 'Any status', b.status, [['live', 'Active + expired'], 'Active', 'Expired', 'Archived'])}
+    ${sel('fTag', 'Any tag', b.tag, tags)}
+    ${sel('fYear', 'Any year', b.year, years)}
+  </div>
+  <div class="row" style="margin:12px 0 10px"><span class="small muted grow">${docs.length} document${docs.length === 1 ? '' : 's'}</span>
+    <select class="in" id="fSort" style="width:auto;height:36px;font-size:13px"><option value="expiry" ${b.sort === 'expiry' ? 'selected' : ''}>Sort: expiry</option><option value="title" ${b.sort === 'title' ? 'selected' : ''}>Sort: title</option><option value="updated" ${b.sort === 'updated' ? 'selected' : ''}>Sort: updated</option></select></div>
+  ${!docs.length ? `<div class="card empty"><div class="big">🗂️</div>Nothing here yet.<br><a class="btn primary" style="margin-top:14px" href="#add${b.cat ? '?cat=' + encodeURIComponent(b.cat) : ''}">Add a document</a></div>`
+    : b.view === 'grid' ? `<div class="gridv">${docs.map(d => `<a class="gcard" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category)}<div class="t">${d.Pinned ? '★ ' : ''}${esc(d.Title)}${d.Encrypted ? ' 🔒' : ''}</div><div class="small muted ellipsis">${esc(d.Owner || '')}</div><div style="margin-top:auto">${expiryPill(d) || `<span class="tiny dim">${esc(ago(d.Updated))}</span>`}</div></a>`).join('')}</div>`
+    : `<div class="list">${docs.map(docItem).join('')}</div>`}`;
+}
+afterRender.browse = () => {
+  const b = S.ui.browse; const save = () => { LS.set('ui', { browse: b }); render(); };
+  $$('[data-cat]').forEach(el => el.onclick = () => { b.cat = el.dataset.cat; save(); });
+  [['fOwner', 'owner'], ['fStatus', 'status'], ['fTag', 'tag'], ['fYear', 'year'], ['fSort', 'sort']].forEach(([id, k]) => $('#' + id).onchange = e => { b[k] = e.target.value; save(); });
+  $('#viewToggle').onclick = () => { b.view = b.view === 'grid' ? 'list' : 'grid'; save(); };
+  const on = $('.chip.on[data-cat]'); if (on && on.dataset.cat) on.scrollIntoView({ inline: 'center', block: 'nearest' });
+};
+/* ============================== 8. document ============================== */
+const objectUrls = [];
+function objUrl(blob) { const u = URL.createObjectURL(blob); objectUrls.push(u); return u; }
+const plainNums = {};
+const linkLabel = { garage: 'Garage car', ledger: 'Ledger transaction', flow: 'Flow task' };
+
+function viewDoc(r) {
+  const d = S.docs[r.id];
+  if (!d) return `${topBar('Not found', { back: true })}<div class="card empty"><div class="big">🔎</div>This document is not on this device yet.<br><button class="btn" style="margin-top:12px" onclick="sync({full:true,quiet:false})">Sync now</button></div>`;
+  const c = catOf(d.Category); const n = daysLeft(d); const lead = leadOf(d);
+  const files = d.Files || [];
+  let validity = '';
+  if (d.ExpiryDate) {
+    const iss = parseYMD(d.IssueDate), exp = parseYMD(d.ExpiryDate), now = parseYMD(todayStr());
+    const pct = iss && exp > iss ? Math.max(0, Math.min(100, 100 * daysBetween(now, exp) / daysBetween(iss, exp))) : null;
+    const tone = expiryTone(n, lead);
+    validity = `<dt>Expires</dt><dd><b>${esc(fmtDate(d.ExpiryDate))}</b> <span class="pill ${tone}">${esc(relDays(n))}</span>
+      ${pct !== null ? `<div class="bar ${tone === 'green' ? '' : tone}"><i style="width:${pct.toFixed(1)}%"></i></div>` : ''}
+      <div class="tiny muted" style="margin-top:4px">${n !== null && n >= 0 && n <= lead ? '⏰ Renewal window open' : `Reminder ${lead} days before`}</div></dd>`;
+  }
+  const prev = d.PrevID && S.docs[d.PrevID];
+  const newer = docList().find(x => x.PrevID === d.ID);
+  const extra = Object.entries(d.Extra || {}).filter(([k, v]) => v && !k.startsWith('_'));
+  const links = S.meta.links || {};
+  const linkPage = d.LinkedApp && links[d.LinkedApp] && links[d.LinkedApp].page;
+  const num = d.DocNumber ? (Crypto.isEnc(d.DocNumber) ? (plainNums[d.ID] ?? null) : d.DocNumber) : '';
+  return `${topBar(esc(d.Title), { back: true, extra: `<button class="iconbtn" id="docMenu" aria-label="More">${icons.more}</button>` })}
+  ${newer ? `<a class="banner" href="#doc=${encodeURIComponent(newer.ID)}" style="margin:0 0 12px"><span>🗂️</span><div class="grow small">This is a previous version. <b>Open the current one</b></div><span class="muted">›</span></a>` : ''}
+  ${files.length ? `<div class="carousel" id="car">${files.map((f, i) => `<button class="slide" data-i="${i}"><span class="tag">${i + 1}/${files.length}${f.ref ? ' · ref' : ''}${f.enc ? ' · 🔒' : ''}</span>
+      <div class="ph"><div class="big">${mimeIcon(f.origMime || f.mime, f.origName || f.name)}</div><div class="small ellipsis" style="max-width:240px">${esc(f.origName || f.name)}</div><div class="tiny dim">${fmtSize(f.size)}${f.pending ? ' · waiting to upload' : ''} · tap to view</div></div></button>`).join('')}</div>
+      ${files.length > 1 ? `<div class="dots" id="dots">${files.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}`
+    : `<div class="card empty" style="padding:24px"><div class="big">📭</div>No file attached. <a href="#edit=${encodeURIComponent(d.ID)}">Add one</a></div>`}
+  <div class="card" style="margin-top:14px"><dl class="kv" style="margin:0">
+    ${d.DocNumber ? `<dt>No.</dt><dd><div class="row">${num === null
+      ? `<button class="btn sm" id="unlockNum">🔒 Unlock number</button>`
+      : `<span class="num grow" id="num" data-v="${esc(num)}" title="Press and hold to reveal">${esc(maskNumber(num))}</span>
+         <button class="iconbtn" id="eyeBtn" aria-label="Reveal number" style="width:34px;height:34px">${icons.eye}</button>
+         <button class="iconbtn" id="copyBtn" aria-label="Copy number" style="width:34px;height:34px">${icons.copy}</button>`}</div></dd>` : ''}
+    <dt>Category</dt><dd><span class="chip"><span>${esc(c.Icon)}</span>${esc(d.Category)}</span></dd>
+    ${d.Owner ? `<dt>Owner</dt><dd><span class="chip"><span class="dot" style="background:${esc(personOf(d.Owner).Colour)}"></span>${esc(d.Owner)}</span></dd>` : ''}
+    ${d.Issuer ? `<dt>Issuer</dt><dd>${esc(d.Issuer)}</dd>` : ''}
+    ${d.IssueDate ? `<dt>Issued</dt><dd>${esc(fmtDate(d.IssueDate))}</dd>` : ''}
+    ${validity}
+    ${extra.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}
+    ${d.Tags ? `<dt>Tags</dt><dd class="row wrap" style="gap:6px">${String(d.Tags).split(',').map(t => t.trim()).filter(Boolean).map(t => `<a class="chip" href="#browse" data-tag="${esc(t)}">#${esc(t)}</a>`).join('')}</dd>` : ''}
+    ${d.LinkedApp ? `<dt>Linked</dt><dd>${linkPage ? `<a href="${esc(linkPage)}#${d.LinkedApp === 'garage' ? 'car' : d.LinkedApp === 'ledger' ? 'txn' : 'task'}=${encodeURIComponent(d.LinkedID)}" target="_blank" rel="noopener">${esc(linkLabel[d.LinkedApp] || d.LinkedApp)} ↗</a>` : esc(linkLabel[d.LinkedApp] || d.LinkedApp)} <span class="tiny dim">${esc(d.LinkedID)}</span></dd>` : ''}
+    ${d.Notes ? `<dt>Notes</dt><dd style="white-space:pre-wrap">${esc(d.Notes)}</dd>` : ''}
+    <dt>Status</dt><dd>${esc(statusOf(d))}${d.Encrypted ? ' · 🔒 encrypted files' : ''}</dd>
+    ${prev ? `<dt>Previous</dt><dd><a href="#doc=${encodeURIComponent(prev.ID)}">${esc(prev.Title)}</a> <span class="tiny dim">${prev.ExpiryDate ? 'exp ' + esc(fmtDate(prev.ExpiryDate)) : ''}</span></dd>` : ''}
+    <dt>Updated</dt><dd class="small muted">${esc(ago(d.Updated))}${d._local ? ' · waiting to sync' : ''}</dd>
+  </dl></div>
+  <div class="actions">
+    <button class="btn" id="shareBtn" ${files.length ? '' : 'disabled'}>Share</button>
+    <a class="btn ${d.ExpiryDate && n !== null && n <= lead ? 'primary' : ''}" href="#renew=${encodeURIComponent(d.ID)}">Renew</a>
+    <button class="btn" id="archBtn">${d.Status === 'Archived' ? 'Unarchive' : 'Archive'}</button>
+  </div>
+  ${files.some(f => !f.pending) ? `<p class="tiny dim" style="margin-top:14px">Drive: ${files.filter(f => !f.ref).map(f => esc(f.name)).join(', ')}</p>` : ''}`;
+}
+afterRender.doc = r => {
+  const d = S.docs[r.id]; if (!d) return;
+  const files = d.Files || [];
+  $$('.slide').forEach(el => el.onclick = () => openViewer(files[+el.dataset.i], d));
+  const car = $('#car');
+  if (car && $('#dots')) car.addEventListener('scroll', debounce(() => {
+    const i = Math.round(car.scrollLeft / car.clientWidth); $$('#dots i').forEach((x, j) => x.classList.toggle('on', i === j));
+  }, 40), { passive: true });
+  // load previews (images inline, PDFs inline on wide screens)
+  const gen = renderGen;
+  (async () => {
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i]; const m = f.origMime || f.mime || '';
+      const isImg = /^image\//.test(m), isPdf = /pdf/.test(m);
+      if (!(isImg || (isPdf && innerWidth >= 700)) || f.size > 8 * 1024 * 1024) continue;
+      if (f.enc && !S.encKey) continue;
+      try {
+        const got = await getFile(f);
+        if (gen !== renderGen) return; // a newer render owns the DOM now
+        const slide = $(`.slide[data-i="${i}"]`); if (!slide) return;
+        const url = objUrl(got.blob);
+        const tag = $('.tag', slide).outerHTML;
+        slide.innerHTML = tag + (isImg ? `<img src="${url}" alt="${esc(f.origName || f.name)}">` : `<iframe src="${url}#toolbar=0" title="PDF preview"></iframe>`);
+      } catch (e) { /* placeholder stays */ }
+    }
+  })();
+  $$('[data-tag]').forEach(a => a.onclick = () => { Object.assign(S.ui.browse, { tag: a.dataset.tag, cat: '', status: 'live' }); });
+  const numEl = $('#num');
+  if (numEl) {
+    const v = numEl.dataset.v; let t = null;
+    const show = () => { numEl.textContent = v; numEl.classList.add('reveal'); };
+    const hide = () => { numEl.textContent = maskNumber(v); numEl.classList.remove('reveal'); };
+    numEl.addEventListener('pointerdown', () => { t = setTimeout(show, 250); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => numEl.addEventListener(ev, () => { clearTimeout(t); hide(); }));
+    numEl.addEventListener('contextmenu', e => e.preventDefault());
+    let eyeT; $('#eyeBtn').onclick = () => { if (numEl.classList.contains('reveal')) { hide(); clearTimeout(eyeT); } else { show(); clearTimeout(eyeT); eyeT = setTimeout(hide, 15000); } };
+    $('#copyBtn').onclick = () => copySecret(v);
+  }
+  const un = $('#unlockNum');
+  if (un) un.onclick = async () => {
+    const key = await needEncKey(); if (!key) return;
+    try { plainNums[d.ID] = await Crypto.decText(key, d.DocNumber); render(); } catch (e) { toast('Could not decrypt — wrong passphrase?', { error: true }); }
+  };
+  $('#docMenu').onclick = () => docMenu(d);
+  $('#shareBtn').onclick = () => shareDoc(d);
+  $('#archBtn').onclick = () => {
+    const nd = Object.assign({}, d, { Status: d.Status === 'Archived' ? 'Active' : 'Archived', Pinned: d.Status === 'Archived' ? d.Pinned : false });
+    saveLocal(nd); toast(nd.Status === 'Archived' ? 'Archived — kept in Browse › Archived' : 'Restored to active');
+  };
+};
+let clipTimer = null;
+async function copySecret(v) {
+  try {
+    await navigator.clipboard.writeText(v);
+    toast('Copied — clipboard clears in 60 s');
+    clearTimeout(clipTimer);
+    clipTimer = setTimeout(() => { navigator.clipboard.writeText(' ').catch(() => {}); }, 60000);
+  } catch (e) { toast('Copy not allowed here', { error: true }); }
+}
+function docMenu(d) {
+  const s = sheet(`<h2 class="ellipsis">${esc(d.Title)}</h2><div class="list menu" style="margin-top:10px">
+    <a class="item" href="#edit=${encodeURIComponent(d.ID)}" data-close>✏️ <span class="grow">Edit details & files</span></a>
+    <button class="item" data-a="pin">${d.Pinned ? '☆' : '★'} <span class="grow">${d.Pinned ? 'Remove from Quick access' : 'Pin to Quick access'}</span></button>
+    <a class="item" href="#renew=${encodeURIComponent(d.ID)}" data-close>🔁 <span class="grow">Renew (new version)</span></a>
+    <button class="item" data-a="dl" ${(d.Files || []).length ? '' : 'disabled'}>⬇️ <span class="grow">Download files</span></button>
+    <button class="item" data-a="del" style="color:#FF8A82">🗑️ <span class="grow">Delete (Trash, 30 days)</span></button>
+  </div><button class="btn block" style="margin-top:12px" data-close>Cancel</button>`);
+  $$('[data-a]', s.el).forEach(b => b.onclick = async () => {
+    s.close();
+    if (b.dataset.a === 'pin') { saveLocal(Object.assign({}, d, { Pinned: !d.Pinned })); toast(d.Pinned ? 'Unpinned' : 'Pinned to Quick access'); }
+    if (b.dataset.a === 'dl') {
+      for (const f of d.Files) { try { const g = await getFile(f); download(f.origName || f.name, g.blob); } catch (e) { toast(errText(e), { error: true }); } }
+    }
+    if (b.dataset.a === 'del') {
+      if (!await ask('Delete document?', `“${esc(d.Title)}” and its files move to <b>Vault/_Trash</b>. You can restore it from Settings for 30 days.`, 'Delete', true)) return;
+      delete S.docs[d.ID]; queue({ op: 'delete', docId: d.ID, title: d.Title });
+      location.hash = '#browse'; toast('Moved to Trash', { action: 'Undo', onAction: () => undoDelete(d) });
+    }
+  });
+}
+async function undoDelete(d) {
+  // if the delete is still queued just drop it, else restore on the server
+  const i = S.outbox.findIndex(o => o.op === 'delete' && o.docId === d.ID);
+  if (i > -1 && !flushing) { S.outbox.splice(i, 1); S.docs[d.ID] = d; persist(); render(); return; }
+  try { await (flushing || Promise.resolve()); const r = await api('restoreDoc', { id: d.ID }); S.docs[r.doc.ID] = r.doc; persist(); render(); toast('Restored'); }
+  catch (e) { toast(errText(e), { error: true }); }
+}
+async function shareDoc(d) {
+  const files = d.Files || [];
+  const s = sheet(`<h2>Share</h2><p class="muted small">Sending from the device keeps the file private. A link makes the Drive file viewable by anyone with the link for 24 hours, then it is revoked automatically.</p>
+    ${files.length > 1 ? `<label class="f"><span>File</span><select class="in" id="shFile">${files.map((f, i) => `<option value="${i}">${esc(f.origName || f.name)}</option>`).join('')}</select></label>` : ''}
+    <div class="col" style="margin-top:14px">
+      <button class="btn primary block" id="shDevice">📤 Send file from this device</button>
+      <button class="btn block" id="shLink">🔗 Create 24-hour link</button>
+    </div><div id="shOut"></div><button class="btn ghost block" style="margin-top:8px" data-close>Close</button>`);
+  const idx = () => Number(($('#shFile', s.el) || { value: 0 }).value);
+  $('#shDevice', s.el).onclick = async () => {
+    const f = files[idx()];
+    try {
+      const g = await getFile(f);
+      const file = new File([g.blob], f.origName || f.name, { type: g.mime || g.blob.type });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: d.Title });
+      else download(file.name, file);
+    } catch (e) { if (e.name !== 'AbortError') toast(errText(e), { error: true }); }
+  };
+  $('#shLink', s.el).onclick = async () => {
+    const f = files[idx()];
+    if (f.enc) return toast(ERRORS.encrypted_file, { error: true });
+    if (f.pending) return toast('Wait for the upload to finish', { error: true });
+    if (!await ask('Create public link?', 'Anyone with the link can view this file for <b>24 hours</b>. It is logged and revoked automatically.', 'Create link')) return;
+    try {
+      const r = await api('share', { docId: d.ID, fileIndex: idx() });
+      $('#shOut', s.el).innerHTML = `<div class="card" style="margin-top:12px"><div class="small muted">Valid until ${esc(new Date(r.share.Expires).toLocaleString())}</div>
+        <div class="small" style="overflow-wrap:anywhere;margin:6px 0">${esc(r.share.Url)}</div>
+        <div class="btns"><button class="btn sm" id="shCopy">Copy</button><button class="btn sm" id="shSend">Send…</button><button class="btn sm danger" id="shRevoke">Revoke now</button></div></div>`;
+      $('#shCopy', s.el).onclick = () => navigator.clipboard.writeText(r.share.Url).then(() => toast('Link copied'));
+      $('#shSend', s.el).onclick = () => navigator.share ? navigator.share({ url: r.share.Url, title: d.Title }).catch(() => {}) : navigator.clipboard.writeText(r.share.Url);
+      $('#shRevoke', s.el).onclick = async () => { await api('revokeShare', { id: r.share.ID }); toast('Link revoked'); s.close(); };
+    } catch (e) { toast(errText(e), { error: true }); }
+  };
+}
+/** Optimistic local save + queued server save. */
+function saveLocal(d, extra = {}) {
+  d.Updated = new Date().toISOString(); d._local = true;
+  S.docs[d.ID] = d; persist();
+  queue(Object.assign({ op: 'save', docId: d.ID, title: d.Title }, extra));
+  render(); updateBadge();
+}
+
+/* ============================== 9. expiring ============================== */
+function viewExpiring() {
+  const docs = docList().filter(d => isLive(d) && d.ExpiryDate).map(d => ({ d, n: daysLeft(d) })).sort((a, b) => a.n - b.n);
+  const noExp = docList().filter(d => isLive(d) && !d.ExpiryDate).length;
+  const row = ({ d, n }) => `<div class="item">${catIcon(d.Category)}<a class="grow" href="#doc=${encodeURIComponent(d.ID)}" style="color:inherit;min-width:0"><div class="t ellipsis">${esc(d.Title)}</div><div class="s ellipsis">${esc(fmtDate(d.ExpiryDate))} · ${esc(relDays(n))}${d.Owner ? ' · ' + esc(d.Owner) : ''}</div></a><a class="btn sm ${n <= leadOf(d) ? 'primary' : ''}" href="#renew=${encodeURIComponent(d.ID)}">Renew</a></div>`;
+  const grp = (title, tone, items, note) => items.length ? `<div class="section"><div class="hd"><h2><span class="pill ${tone}">${items.length}</span> ${title}</h2>${note ? `<span class="tiny muted">${note}</span>` : ''}</div><div class="list">${items.map(row).join('')}</div></div>` : '';
+  const overdue = docs.filter(x => x.n < 0), d30 = docs.filter(x => x.n >= 0 && x.n <= 30), d180 = docs.filter(x => x.n > 30 && x.n <= 180), later = docs.filter(x => x.n > 180);
+  const months = {}; docs.filter(x => x.n >= 0).forEach(x => { const k = x.d.ExpiryDate.slice(0, 7); (months[k] = months[k] || []).push(x); });
+  return `${topBar('Expiring')}
+  ${!docs.length ? `<div class="card empty"><div class="big">⏳</div>No expiry dates yet.<br><span class="small">Add an expiry date to a passport, licence, insurance or road tax and it shows up here with calendar reminders.</span></div>` : ''}
+  ${grp('Overdue', 'red', overdue)}
+  ${grp('Next 30 days', 'amber', d30)}
+  ${grp('31 – 180 days', 'green', d180)}
+  ${grp('Later', 'grey', later)}
+  ${Object.keys(months).length ? `<div class="section"><div class="hd"><h2>Timeline</h2></div><div class="timeline">${Object.keys(months).sort().map(k => {
+    const [y, m] = k.split('-'); return `<div class="tm"><h3>${MONTHS[+m - 1]} ${y}</h3>${months[k].map(({ d, n }) => `<a class="row small" href="#doc=${encodeURIComponent(d.ID)}" style="color:inherit;padding:3px 0"><span>${esc(catOf(d.Category).Icon)}</span><span class="grow ellipsis">${esc(d.Title)}</span><span class="pill ${expiryTone(n, leadOf(d))}">${+d.ExpiryDate.slice(8)} ${MONTHS[+m - 1]}</span></a>`).join('')}</div>`;
+  }).join('')}</div></div>` : ''}
+  ${noExp ? `<p class="small muted" style="margin-top:18px">${noExp} active document${noExp === 1 ? ' has' : 's have'} no expiry date. <a href="#browse">Browse</a></p>` : ''}
+  <p class="tiny dim" style="margin-top:10px">Reminders are created in your Google Calendar “Vault” on expiry − lead days and on the expiry date.</p>`;
+}
+/* ============================== 10. add / edit / renew ============================== */
+const EMPTY_DOC = () => ({ ID: '', Title: '', Category: '', Owner: '', DocNumber: '', Issuer: '', IssueDate: '', ExpiryDate: '', RenewalLeadDays: '', Tags: '', Files: [], LinkedApp: '', LinkedID: '', Notes: '', Status: 'Active', Pinned: false, Extra: {}, PrevID: '', Encrypted: false });
+const ISSUERS = { Identity: 'JPN', Travel: 'Imigresen', Vehicle: 'JPJ', 'Finance & Tax': 'LHDN', 'Education (ACCA)': 'ACCA' };
+
+function initForm(r) {
+  const key = r.view === 'add' ? 'add' : r.view + '=' + r.id;
+  if (S.form && S.form.key === key) {
+    if (r.view === 'add' && (r.params.cat || r.params.title) && !S.form.touched) applyParams(S.form, r.params);
+    return;
+  }
+  if (S.form && S.form.touched && S.form.files.some(f => f.local)) {
+    // keep an unsaved add form around unless the user starts editing something else
+    if (key !== 'add' && S.form.key === 'add') S.stash = S.form;
+  }
+  if (key === 'add' && S.stash) { S.form = S.stash; S.stash = null; return; }
+  const f = { key, mode: r.view, files: [], touched: false, encrypt: false };
+  if (r.view === 'add') {
+    f.doc = EMPTY_DOC(); f.doc.ID = uid('d'); f.doc.Category = S.cats[0] ? S.cats[0].Name : ''; f.doc.Owner = S.people[0] ? S.people[0].Name : '';
+    applyParams(f, r.params);
+  } else {
+    const src = S.docs[r.id]; if (!src) { S.form = null; return; }
+    f.doc = JSON.parse(JSON.stringify(src)); delete f.doc._local;
+    if (Crypto.isEnc(f.doc.DocNumber)) f.doc.DocNumber = plainNums[src.ID] ?? f.doc.DocNumber;
+    if (r.view === 'edit') { f.files = (src.Files || []).map(x => ({ file: x })); f.encrypt = !!src.Encrypted; }
+    else {
+      f.oldId = src.ID; f.doc.ID = uid('d'); f.doc.Files = []; f.doc.IssueDate = ''; f.doc.ExpiryDate = ''; f.doc.PrevID = src.ID; f.doc.Status = 'Active';
+      f.doc.Tags = String(f.doc.Tags || '').split(',').map(t => t.trim()).filter(t => t && t !== 'previous-version').join(', ');
+      f.encrypt = !!src.Encrypted;
+    }
+  }
+  S.form = f;
+}
+function applyParams(f, p) {
+  if (p.cat && S.cats.some(c => c.Name === p.cat)) f.doc.Category = p.cat;
+  if (p.title) f.doc.Title = p.title + (f.doc.Owner && f.doc.Owner !== 'Household' ? ' – ' + f.doc.Owner : '');
+  if (p.linkedApp) { f.doc.LinkedApp = p.linkedApp; f.doc.LinkedID = p.linkedId || ''; }
+  f.encrypt = encDefault(f.doc.Category);
+  if (!f.doc.Issuer && ISSUERS[f.doc.Category]) f.doc.Issuer = ISSUERS[f.doc.Category];
+}
+function encDefault(cat) { const m = catOf(cat).Encrypt; return m === 'always' || (m === 'ask' && !!S.meta.encSalt); }
+
+function viewAdd(r) {
+  if (!S.form || S.form.key !== (r.view === 'add' ? 'add' : r.view + '=' + r.id)) {
+    initForm(r);
+    if (!S.form) return `${topBar('Not found', { back: true })}<div class="card empty">This document is not on this device.</div>`;
+  }
+  const f = S.form, d = f.doc, c = catOf(d.Category);
+  const title = f.mode === 'add' ? 'Add document' : f.mode === 'edit' ? 'Edit' : 'Renew';
+  const fields = String(c.Fields || '').split(',').map(s => s.trim()).filter(Boolean);
+  const encMode = c.Encrypt;
+  const links = S.meta.links || {};
+  const opt = (list, cur) => list.map(v => `<option ${v === cur ? 'selected' : ''}>${esc(v)}</option>`).join('');
+  return `${topBar(title, { back: f.mode !== 'add' })}
+  ${f.mode === 'renew' ? `<div class="card small" style="margin-bottom:12px">Renewing <b>${esc(S.docs[f.oldId] ? S.docs[f.oldId].Title : '')}</b>. Upload the new document and set the new expiry — the old one is archived and kept as the previous version, and the calendar reminders move to the new date.</div>` : ''}
+  <form id="docForm" autocomplete="off" onsubmit="return false">
+  <div class="srcs">
+    <button type="button" class="src" id="srcScan"><span class="e">📷</span>Scan</button>
+    <button type="button" class="src" id="srcFile"><span class="e">📄</span>File</button>
+    <button type="button" class="src" id="srcPhoto"><span class="e">🖼️</span>Photo</button>
+  </div>
+  <div class="files" id="fileList"></div>
+  <div class="grid2">
+    <label class="f"><span>Category</span><select class="in" name="Category">${opt(S.cats.map(x => x.Name), d.Category)}${S.cats.some(x => x.Name === d.Category) ? '' : `<option selected>${esc(d.Category)}</option>`}</select></label>
+    <label class="f"><span>Owner</span><select class="in" name="Owner">${opt(S.people.map(x => x.Name), d.Owner)}${!d.Owner || S.people.some(x => x.Name === d.Owner) ? '' : `<option selected>${esc(d.Owner)}</option>`}</select></label>
+  </div>
+  <label class="f"><span>Title</span><input class="in" name="Title" value="${esc(d.Title)}" placeholder="${esc((d.Category || 'Document') + ' – ' + (d.Owner || 'Me'))}" maxlength="200"></label>
+  <div class="grid2">
+    <label class="f"><span>Issue date</span><input class="in" type="date" name="IssueDate" value="${esc(d.IssueDate)}"></label>
+    <label class="f"><span>Expiry date</span><input class="in" type="date" name="ExpiryDate" value="${esc(d.ExpiryDate)}"></label>
+  </div>
+  <div class="row wrap" id="quickExp" style="gap:6px;margin-top:8px">${d.IssueDate ? [1, 2, 3, 5, 10].map(y => `<button type="button" class="chip" data-y="${y}">+${y} yr</button>`).join('') : ''}</div>
+  <div class="grid2">
+    <label class="f"><span>Document number</span><input class="in" name="DocNumber" value="${esc(Crypto.isEnc(d.DocNumber) ? '' : d.DocNumber)}" placeholder="${Crypto.isEnc(d.DocNumber) ? '🔒 unchanged' : 'A12345678'}" autocapitalize="characters" spellcheck="false"></label>
+    <label class="f"><span>Remind before (days)</span><input class="in" type="number" inputmode="numeric" min="0" max="3650" name="RenewalLeadDays" value="${esc(d.RenewalLeadDays)}" placeholder="${esc(c.LeadDays)} (default)"></label>
+  </div>
+  <div class="grid2">
+    <label class="f"><span>Issuer</span><input class="in" name="Issuer" value="${esc(d.Issuer)}" placeholder="JPN, JPJ, insurer…" list="issuerList"></label>
+    <label class="f"><span>Tags</span><input class="in" name="Tags" value="${esc(d.Tags)}" placeholder="travel, family"></label>
+  </div>
+  <datalist id="issuerList">${[...new Set(['JPN', 'Imigresen', 'JPJ', 'LHDN', 'ACCA', 'KWSP', 'PERKESO', ...docList().map(x => x.Issuer).filter(Boolean)])].map(v => `<option value="${esc(v)}">`).join('')}</datalist>
+  ${fields.length ? `<div class="grid2">${fields.map(k => `<label class="f"><span>${esc(k)}</span><input class="in" data-extra="${esc(k)}" value="${esc((d.Extra || {})[k] || '')}"></label>`).join('')}</div>` : ''}
+  <div class="grid2">
+    <label class="f"><span>Linked app</span><select class="in" name="LinkedApp"><option value="">None</option>${['garage', 'ledger', 'flow'].map(a => `<option value="${a}" ${d.LinkedApp === a ? 'selected' : ''}>${a[0].toUpperCase() + a.slice(1)}</option>`).join('')}</select></label>
+    <label class="f"><span>Linked ID</span><div class="row" style="gap:6px"><input class="in" name="LinkedID" value="${esc(d.LinkedID)}" placeholder="car / txn / task id">${d.LinkedApp && links[d.LinkedApp] && links[d.LinkedApp].url ? `<button type="button" class="btn sm" id="pickLink" style="height:46px">Pick</button>` : ''}</div></label>
+  </div>
+  <label class="f"><span>Notes</span><textarea class="in" name="Notes" rows="3">${esc(d.Notes)}</textarea></label>
+  <div class="card" style="margin-top:14px;padding:2px 14px">
+    <div class="toggle"><div><div>Pin to Quick access</div><div class="tiny muted">Shows on Home</div></div><label class="sw"><input type="checkbox" name="Pinned" ${d.Pinned ? 'checked' : ''}><i></i></label></div>
+    ${encMode ? `<div class="toggle"><div class="grow"><div>Encrypt files on this device 🔒</div><div class="tiny muted">${S.meta.encSalt ? 'AES-GCM before upload. Drive only holds ciphertext.' : 'Set a passphrase in Settings › Security first.'}</div></div>
+      <label class="sw"><input type="checkbox" id="encToggle" ${f.encrypt ? 'checked' : ''} ${!S.meta.encSalt || encMode === 'always' || f.mode === 'edit' ? 'disabled' : ''}><i></i></label></div>` : ''}
+  </div>
+  <div class="row" style="margin-top:18px;gap:10px">
+    ${f.mode === 'add' ? `<button type="button" class="btn" id="clearForm">Clear</button>` : `<button type="button" class="btn" onclick="S.form=null;goBack()">Cancel</button>`}
+    <button type="button" class="btn primary grow" id="saveBtn">${f.mode === 'edit' ? 'Save changes' : 'Save to Drive'}</button>
+  </div>
+  <p class="tiny dim" style="margin-top:10px">Files go to Drive › Vault/${esc(d.Category)}/${esc((d.IssueDate || todayStr()).slice(0, 4))}/ and are renamed ${esc((d.IssueDate || todayStr()) + '_' + d.Category + '_' + (d.Title || '…') + '_' + d.Owner)}. Max 20 MB each.</p>
+  </form>`;
+}
+function renderFileList() {
+  const f = S.form; const el = $('#fileList'); if (!el || !f) return;
+  el.innerHTML = f.files.map((x, i) => {
+    const name = x.local ? x.name : (x.file.origName || x.file.name);
+    const mime = x.local ? x.mime : (x.file.origMime || x.file.mime);
+    const size = x.local ? x.blob.size : x.file.size;
+    return `<div class="fileitem"><div class="thumb">${x.thumb ? `<img src="${x.thumb}" alt="">` : mimeIcon(mime, name)}</div>
+      <div class="grow" style="min-width:0"><div class="small ellipsis">${esc(name)}</div><div class="tiny muted">${fmtSize(size)}${x.local ? ' · new' : x.file.ref ? ' · read-only reference' : ''}${(x.local ? f.encrypt : x.file.enc) ? ' · 🔒' : ''}</div></div>
+      ${i > 0 ? `<button type="button" class="iconbtn" data-up="${i}" aria-label="Move up" style="width:34px;height:34px">↑</button>` : ''}
+      <button type="button" class="iconbtn" data-rm="${i}" aria-label="Remove" style="width:34px;height:34px">${icons.close}</button></div>`;
+  }).join('');
+  $$('[data-rm]', el).forEach(b => b.onclick = () => { const x = f.files.splice(+b.dataset.rm, 1)[0]; if (x.thumb) URL.revokeObjectURL(x.thumb); f.touched = true; renderFileList(); });
+  $$('[data-up]', el).forEach(b => b.onclick = () => { const i = +b.dataset.up; [f.files[i - 1], f.files[i]] = [f.files[i], f.files[i - 1]]; renderFileList(); });
+}
+function refreshFormBits() { renderFileList(); }
+function addLocalFile(blob, name, mime) {
+  if (!S.form) return;
+  if (blob.size > 20 * 1024 * 1024) return toast(`${name} is over 20 MB`, { error: true });
+  const item = { local: true, blob, name, mime: mime || blob.type || 'application/octet-stream' };
+  if (/^image\//.test(item.mime)) item.thumb = URL.createObjectURL(blob);
+  S.form.files.push(item); S.form.touched = true; renderFileList();
+}
+afterRender.add = afterRender.edit = afterRender.renew = () => {
+  const f = S.form; if (!f) return; const form = $('#docForm');
+  renderFileList();
+  const read = () => {
+    const d = f.doc; const fd = new FormData(form);
+    ['Title', 'Category', 'Owner', 'IssueDate', 'ExpiryDate', 'Issuer', 'Tags', 'LinkedApp', 'LinkedID', 'Notes'].forEach(k => d[k] = (fd.get(k) || '').toString());
+    const num = (fd.get('DocNumber') || '').toString(); if (num || !Crypto.isEnc(d.DocNumber)) d.DocNumber = num;
+    d.RenewalLeadDays = fd.get('RenewalLeadDays') === '' ? '' : Number(fd.get('RenewalLeadDays'));
+    d.Pinned = !!fd.get('Pinned');
+    d.Extra = Object.assign({}, d.Extra); $$('[data-extra]', form).forEach(i => d.Extra[i.dataset.extra] = i.value);
+    const et = $('#encToggle'); if (et && !et.disabled) f.encrypt = et.checked;
+    f.touched = true;
+  };
+  form.addEventListener('input', read);
+  form.addEventListener('change', e => {
+    read();
+    if (e.target.name === 'Category') { f.encrypt = f.mode === 'edit' ? f.encrypt : encDefault(f.doc.Category); if (ISSUERS[f.doc.Category] && !f.doc.Issuer) f.doc.Issuer = ISSUERS[f.doc.Category]; render({ force: true }); }
+    if (['IssueDate', 'LinkedApp'].includes(e.target.name)) render({ force: true });
+  });
+  $$('[data-y]').forEach(b => b.onclick = () => {
+    const iss = parseYMD(f.doc.IssueDate); if (!iss) return;
+    const e = new Date(iss.getFullYear() + Number(b.dataset.y), iss.getMonth(), iss.getDate() - 1);
+    f.doc.ExpiryDate = e.getFullYear() + '-' + String(e.getMonth() + 1).padStart(2, '0') + '-' + String(e.getDate()).padStart(2, '0');
+    form.ExpiryDate.value = f.doc.ExpiryDate;
+  });
+  $('#srcScan').onclick = () => openScanner();
+  $('#srcFile').onclick = () => pick('#pickFile', async files => { for (const x of files) addLocalFile(x, x.name, x.type); });
+  $('#srcPhoto').onclick = () => pick('#pickPhoto', async files => {
+    for (const x of files) { try { const out = await compressImage(x); addLocalFile(out, x.name.replace(/\.\w+$/, '') + '.jpg', 'image/jpeg'); } catch (e) { addLocalFile(x, x.name, x.type); } }
+  });
+  const cl = $('#clearForm'); if (cl) cl.onclick = () => { f.files.forEach(x => x.thumb && URL.revokeObjectURL(x.thumb)); S.form = null; S.stash = null; render({ force: true }); };
+  const pl = $('#pickLink'); if (pl) pl.onclick = () => pickLinked(f.doc.LinkedApp, id => { f.doc.LinkedID = id; form.LinkedID.value = id; });
+  $('#saveBtn').onclick = () => saveForm().catch(e => { console.error(e); toast(errText(e), { error: true }); });
+};
+function pick(sel, cb) {
+  const input = $(sel); input.value = '';
+  input.onchange = () => { const files = Array.from(input.files || []); if (files.length) cb(files); };
+  input.click();
+}
+async function saveForm() {
+  const f = S.form; if (!f) return;
+  const d = Object.assign({}, f.doc);
+  if (!d.Category) return toast('Pick a category', { error: true });
+  if (d.IssueDate && d.ExpiryDate && d.ExpiryDate < d.IssueDate) return toast('Expiry is before the issue date', { error: true });
+  if (!d.Title.trim()) d.Title = `${d.Category} – ${d.Owner || 'Me'}`;
+  if (f.mode === 'renew' && !f.files.length && !await ask('No new file?', 'You are renewing without uploading the new document. Save anyway?', 'Save')) return;
+  const enc = f.mode === 'edit' ? !!d.Encrypted : f.encrypt;
+  let key = null;
+  if (enc) { key = await needEncKey(); if (!key) return; }
+  $('#saveBtn').disabled = true;
+  if (enc && d.DocNumber && !Crypto.isEnc(d.DocNumber)) { plainNums[d.ID] = d.DocNumber; d.DocNumber = await Crypto.encText(key, d.DocNumber); }
+  const files = []; const cleanup = [];
+  for (let i = 0; i < f.files.length; i++) {
+    const x = f.files[i];
+    if (!x.local) { files.push(x.file); continue; }
+    let blob = x.blob;
+    if (enc) blob = new Blob([await Crypto.encrypt(key, await x.blob.arrayBuffer())], { type: 'application/octet-stream' });
+    const k = 'pend:' + uid('b');
+    await DB.set(k, { blob, name: x.name, mime: x.mime }, 'blobs');
+    files.push({ pending: k, name: x.name, mime: x.mime, size: blob.size, enc, page: i + 1 });
+    if (x.thumb) URL.revokeObjectURL(x.thumb);
+    cleanup.push(k);
+  }
+  d.Files = files; d.Encrypted = enc;
+  const old = f.mode === 'edit' ? S.docs[d.ID] : null;
+  const links = S.meta.links || {};
+  const flowTask = !!(links.flow && links.flow.tasks && links.flow.url && d.ExpiryDate && (!old || old.ExpiryDate !== d.ExpiryDate));
+  if (f.mode === 'renew') {
+    const prev = S.docs[f.oldId];
+    if (prev) { S.docs[prev.ID] = Object.assign({}, prev, { Status: 'Archived', Pinned: false }); d.Pinned = d.Pinned || prev.Pinned; }
+    d.Updated = new Date().toISOString(); d.Created = d.Updated; d._local = true; S.docs[d.ID] = d; persist();
+    queue({ op: 'renew', docId: d.ID, oldId: f.oldId, title: d.Title, flowTask });
+  } else {
+    if (!old) d.Created = new Date().toISOString();
+    saveLocal(d, { flowTask });
+  }
+  S.form = null; S.stash = null;
+  savedAnimation();
+  location.hash = '#doc=' + encodeURIComponent(d.ID);
+  if (!navigator.onLine) toast('Saved on this device — it uploads when you are back online');
+}
+
+/* ============================== 11. scan / images / pdf ============================== */
+async function loadBitmap(blob) {
+  if (window.createImageBitmap) { try { return await createImageBitmap(blob, { imageOrientation: 'from-image' }); } catch (e) {} }
+  return new Promise((res, rej) => { const img = new Image(); const u = URL.createObjectURL(blob); img.onload = () => { URL.revokeObjectURL(u); res(img); }; img.onerror = rej; img.src = u; });
+}
+function canvasToBlob(c, q) { return new Promise(r => c.toBlob(r, 'image/jpeg', q)); }
+/** Draw bitmap with optional crop box (fractions) and rotation (deg, multiples of 90) scaled to maxDim. */
+function renderPage(bmp, { crop = null, rot = 0, maxDim = 2400 } = {}) {
+  const W = bmp.width, H = bmp.height;
+  const sx = crop ? crop.x * W : 0, sy = crop ? crop.y * H : 0, sw = crop ? crop.w * W : W, sh = crop ? crop.h * H : H;
+  const scale = Math.min(1, maxDim / Math.max(sw, sh));
+  const dw = Math.round(sw * scale), dh = Math.round(sh * scale);
+  const c = document.createElement('canvas'); const swap = rot % 180 !== 0;
+  c.width = swap ? dh : dw; c.height = swap ? dw : dh;
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+  g.translate(c.width / 2, c.height / 2); g.rotate(rot * Math.PI / 180);
+  g.drawImage(bmp, sx, sy, sw, sh, -dw / 2, -dh / 2, dw, dh);
+  return c;
+}
+/** Simple auto-crop: find the region that differs from the border colour (document on a table). */
+function detectCrop(bmp) {
+  const S2 = 320, k = S2 / Math.max(bmp.width, bmp.height);
+  const w = Math.max(8, Math.round(bmp.width * k)), h = Math.max(8, Math.round(bmp.height * k));
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(bmp, 0, 0, w, h);
+  const px = g.getImageData(0, 0, w, h).data;
+  const lum = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) lum[i] = 0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2];
+  const bw = Math.max(2, Math.round(Math.min(w, h) * 0.04));
+  let sum = 0, sq = 0, n = 0;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    if (x < bw || y < bw || x >= w - bw || y >= h - bw) { const v = lum[y * w + x]; sum += v; sq += v * v; n++; }
+  }
+  const mean = sum / n, sd = Math.sqrt(Math.max(0, sq / n - mean * mean));
+  if (sd > 45) return null; // busy border → not a document-on-table shot
+  const th = Math.max(28, sd * 2.5);
+  const rows = new Uint16Array(h), cols = new Uint16Array(w);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (Math.abs(lum[y * w + x] - mean) > th) { rows[y]++; cols[x]++; }
+  const rTh = w * 0.18, cTh = h * 0.18;
+  let top = 0, bot = h - 1, left = 0, right = w - 1;
+  while (top < h && rows[top] < rTh) top++;
+  while (bot > top && rows[bot] < rTh) bot--;
+  while (left < w && cols[left] < cTh) left++;
+  while (right > left && cols[right] < cTh) right--;
+  const bwid = right - left + 1, bht = bot - top + 1;
+  if (bwid < w * 0.3 || bht < h * 0.3 || (bwid > w * 0.96 && bht > h * 0.96)) return null;
+  const pad = 0.012;
+  const x0 = Math.max(0, left / w - pad), y0 = Math.max(0, top / h - pad);
+  return { x: x0, y: y0, w: Math.min(1 - x0, bwid / w + 2 * pad), h: Math.min(1 - y0, bht / h + 2 * pad) };
+}
+/** JPEG ≤ maxBytes by stepping quality then size down. */
+async function compressImage(blob, { maxBytes = 1.5 * 1024 * 1024, maxDim = 2400, crop = null, rot = 0, bmp = null } = {}) {
+  bmp = bmp || await loadBitmap(blob);
+  let dim = maxDim, out = null;
+  for (let pass = 0; pass < 6; pass++) {
+    const c = renderPage(bmp, { crop, rot, maxDim: dim });
+    for (const q of [0.86, 0.76, 0.66, 0.56]) {
+      out = await canvasToBlob(c, q);
+      if (out && out.size <= maxBytes) return Object.assign(out, { w: c.width, h: c.height });
+    }
+    dim = Math.round(dim * 0.8);
+  }
+  const c = renderPage(bmp, { crop, rot, maxDim: dim });
+  return Object.assign(out || blob, { w: c.width, h: c.height });
+}
+/** Minimal PDF writer: one JPEG per page (DCTDecode), page sized to A4 width. No library needed. */
+async function jpegsToPdf(pages) {
+  const te = new TextEncoder(); const chunks = []; let len = 0; const offs = [];
+  const push = x => { const b = typeof x === 'string' ? te.encode(x) : x; chunks.push(b); len += b.length; };
+  const obj = (num, write) => { offs[num] = len; push(num + ' 0 obj\n'); write(); push('\nendobj\n'); };
+  push('%PDF-1.4\n%âãÏÓ\n');
+  const n = pages.length, count = 2 + n * 3;
+  obj(1, () => push('<< /Type /Catalog /Pages 2 0 R >>'));
+  obj(2, () => push(`<< /Type /Pages /Kids [${pages.map((_, i) => (3 + 3 * i) + ' 0 R').join(' ')}] /Count ${n} >>`));
+  for (let i = 0; i < n; i++) {
+    const p = pages[i]; const W = p.w > p.h ? 841.89 : 595.28; const H = +(p.h * W / p.w).toFixed(2);
+    const pg = 3 + 3 * i, ct = pg + 1, im = pg + 2;
+    obj(pg, () => push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /XObject << /Im${i} ${im} 0 R >> >> /Contents ${ct} 0 R >>`));
+    const content = `q ${W} 0 0 ${H} 0 0 cm /Im${i} Do Q`;
+    obj(ct, () => push(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`));
+    const bytes = new Uint8Array(await p.blob.arrayBuffer());
+    obj(im, () => { push(`<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${bytes.length} >>\nstream\n`); push(bytes); push('\nendstream'); });
+  }
+  const xref = len;
+  push(`xref\n0 ${count + 1}\n0000000000 65535 f \n`);
+  for (let k = 1; k <= count; k++) push(String(offs[k]).padStart(10, '0') + ' 00000 n \n');
+  push(`trailer\n<< /Size ${count + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  return new Blob(chunks, { type: 'application/pdf' });
+}
+function openScanner() {
+  const pages = [];
+  const s = sheet(`<h2>Scan</h2><p class="small muted">Place the document on a dark, plain surface. Auto-crop trims the background; rotate if needed. Several pages become one PDF.</p>
+    <div class="pages" id="pages" style="margin-top:12px"></div>
+    <div class="col" style="margin-top:14px"><button class="btn block" id="addPage">📷 Add page</button>
+    <button class="btn primary block" id="scanDone" disabled>Use scan</button><button class="btn ghost block" data-close>Cancel</button></div>`,
+    { sticky: true, focus: false, onClose: () => pages.forEach(p => p.url && URL.revokeObjectURL(p.url)) });
+  const draw = () => {
+    $('#pages', s.el).innerHTML = pages.map((p, i) => `<div class="page"><img src="${p.url}" alt="Page ${i + 1}"><span class="pn">${i + 1}${p.box ? (p.crop ? ' · cropped' : ' · full') : ''}</span>
+      <div class="pa"><button data-rot="${i}" aria-label="Rotate">↻</button>${p.box ? `<button data-crop="${i}" aria-label="Toggle crop">✂</button>` : ''}<button data-del="${i}" aria-label="Delete">✕</button></div></div>`).join('') ||
+      `<div class="card small muted" style="grid-column:1/-1;text-align:center">No pages yet</div>`;
+    $('#scanDone', s.el).disabled = !pages.length;
+    $('#scanDone', s.el).textContent = pages.length > 1 ? `Use ${pages.length} pages as one PDF` : 'Use scan';
+    $$('[data-rot]', s.el).forEach(b => b.onclick = () => { const p = pages[+b.dataset.rot]; p.rot = (p.rot + 90) % 360; process(p); });
+    $$('[data-crop]', s.el).forEach(b => b.onclick = () => { const p = pages[+b.dataset.crop]; p.crop = !p.crop; process(p); });
+    $$('[data-del]', s.el).forEach(b => b.onclick = () => { const p = pages.splice(+b.dataset.del, 1)[0]; URL.revokeObjectURL(p.url); draw(); });
+  };
+  const process = async p => {
+    p.out = await compressImage(null, { bmp: p.bmp, crop: p.crop ? p.box : null, rot: p.rot });
+    if (p.url) URL.revokeObjectURL(p.url); p.url = URL.createObjectURL(p.out); draw();
+  };
+  $('#addPage', s.el).onclick = () => pick('#pickCamera', async files => {
+    for (const file of files) {
+      try {
+        const bmp = await loadBitmap(file);
+        const p = { bmp, rot: 0, box: detectCrop(bmp) }; p.crop = !!p.box;
+        pages.push(p); await process(p);
+      } catch (e) { toast('Could not read that image', { error: true }); }
+    }
+  });
+  $('#scanDone', s.el).onclick = async () => {
+    const stamp = todayStr();
+    if (pages.length === 1) addLocalFile(pages[0].out, `scan-${stamp}.jpg`, 'image/jpeg');
+    else {
+      $('#scanDone', s.el).textContent = 'Building PDF…';
+      const pdf = await jpegsToPdf(pages.map(p => ({ blob: p.out, w: p.out.w, h: p.out.h })));
+      addLocalFile(pdf, `scan-${stamp}.pdf`, 'application/pdf');
+    }
+    s.close();
+  };
+  draw();
+  $('#addPage', s.el).click();
+}
+/* ============================== 12. viewer ============================== */
+let viewerUrl = null;
+function closeViewer() { const v = $('#viewer'); if (v) v.remove(); if (viewerUrl) { URL.revokeObjectURL(viewerUrl); viewerUrl = null; } }
+async function openViewer(f, d) {
+  closeViewer();
+  const v = document.createElement('div'); v.id = 'viewer';
+  v.innerHTML = `<div class="vt"><button class="iconbtn" id="vClose" aria-label="Close">${icons.close}</button><div class="grow small ellipsis">${esc(f.origName || f.name)}</div>
+    <button class="btn sm" id="vOpen" disabled>Open</button><button class="btn sm" id="vSave" disabled>Save</button></div>
+    <div class="vb" id="vBody"><div class="muted">Loading…</div></div>`;
+  document.body.appendChild(v);
+  $('#vClose').onclick = closeViewer;
+  try {
+    const got = await getFile(f);
+    if (!v.isConnected) return;
+    const mime = f.origMime || got.mime || f.mime || '';
+    viewerUrl = URL.createObjectURL(got.blob.type ? got.blob : new Blob([got.blob], { type: mime }));
+    const body = $('#vBody');
+    if (/^image\//.test(mime)) { body.innerHTML = `<img id="vImg" src="${viewerUrl}" alt="">`; pinchZoom(body, $('#vImg')); }
+    else if (/pdf/.test(mime)) { body.classList.add('pdf'); body.innerHTML = `<iframe src="${viewerUrl}" title="PDF"></iframe>`; }
+    else body.innerHTML = `<div class="ph muted" style="text-align:center">No in-app preview for this file type.<br>Use Open or Save.</div>`;
+    $('#vOpen').disabled = $('#vSave').disabled = false;
+    $('#vOpen').onclick = () => window.open(viewerUrl, '_blank', 'noopener');
+    $('#vSave').onclick = () => download(f.origName || f.name, got.blob);
+  } catch (e) { $('#vBody').innerHTML = `<div class="muted" style="padding:20px;text-align:center">${esc(errText(e))}</div>`; }
+}
+function pinchZoom(area, img) {
+  let s = 1, x = 0, y = 0; const pts = new Map(); let start = null, lastTap = 0;
+  const apply = () => { img.style.transform = `translate(${x}px,${y}px) scale(${s})`; };
+  const snapshot = () => { const p = [...pts.values()]; return { s, x, y, p: p.map(q => ({ ...q })), d: p.length > 1 ? Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) : 0 }; };
+  area.addEventListener('pointerdown', e => {
+    area.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); start = snapshot();
+    if (pts.size === 1) { const now = Date.now(); if (now - lastTap < 300) { s = s > 1 ? 1 : 2.5; if (s === 1) { x = y = 0; } apply(); } lastTap = now; }
+  });
+  area.addEventListener('pointermove', e => {
+    if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const p = [...pts.values()];
+    if (p.length > 1 && start.d) { const d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); s = Math.max(1, Math.min(6, start.s * d / start.d)); }
+    else if (p.length === 1 && start.p[0] && s > 1) { x = start.x + p[0].x - start.p[0].x; y = start.y + p[0].y - start.p[0].y; }
+    apply();
+  });
+  const end = e => { pts.delete(e.pointerId); start = snapshot(); if (s === 1) { x = y = 0; apply(); } };
+  area.addEventListener('pointerup', end); area.addEventListener('pointercancel', end);
+  area.addEventListener('wheel', e => { e.preventDefault(); s = Math.max(1, Math.min(6, s * (e.deltaY < 0 ? 1.15 : 0.87))); if (s === 1) x = y = 0; apply(); }, { passive: false });
+}
+
+/* ============================== 13. settings ============================== */
+function viewSettings() {
+  const lock = Lock.cfg() || {};
+  const links = S.meta.links || {};
+  const pend = S.outbox.length;
+  const set = (t, sub, right, attrs = '') => `<button class="item" ${attrs}><div class="grow"><div class="t">${t}</div>${sub ? `<div class="s">${sub}</div>` : ''}</div>${right || '<span class="muted">›</span>'}</button>`;
+  return `${topBar('Settings')}
+  <div class="section" style="margin-top:0"><div class="hd"><h2>Bridge</h2></div><div class="list">
+    ${set('Status', esc(S.syncErr || (S.lastSync ? 'Synced ' + ago(new Date(S.lastSync).toISOString()) : 'Not synced yet')) + (pend ? ` · ${pend} change${pend > 1 ? 's' : ''} waiting` : ''), '<span class="muted small">Sync</span>', 'id="sSync"')}
+    ${set('Run checks', 'Bridge, key, Sheet, Drive, Calendar, triggers, this device', '', 'id="sChecks"')}
+    ${S.meta.sheetUrl ? `<a class="item" href="${esc(S.meta.sheetUrl)}" target="_blank" rel="noopener"><div class="grow"><div class="t">Open “Vault Data” Sheet</div><div class="s">The master index</div></div><span class="muted">↗</span></a>` : ''}
+    ${S.meta.folderUrl ? `<a class="item" href="${esc(S.meta.folderUrl)}" target="_blank" rel="noopener"><div class="grow"><div class="t">Open Vault folder in Drive</div></div><span class="muted">↗</span></a>` : ''}
+    ${set('Connection', esc(S.url.replace(/^(https:\/\/script\.google\.com\/macros\/s\/.{6}).+(.{6}\/exec)$/, '$1…$2')), '', 'id="sConn"')}
+  </div></div>
+  <div class="section"><div class="hd"><h2>Security</h2></div><div class="list">
+    ${set('Change PIN', 'Asked on open and after ' + (lock.idle || 5) + ' min idle', '', 'id="sPin"')}
+    <div class="item"><div class="grow"><div class="t">Auto-lock</div><div class="s">After this long without activity</div></div><select class="in" id="sIdle" style="width:auto;height:34px">${[1, 2, 5, 10, 15].map(m => `<option value="${m}" ${(lock.idle || 5) === m ? 'selected' : ''}>${m} min</option>`).join('')}</select></div>
+    <div class="item"><div class="grow"><div class="t">Face ID / fingerprint</div><div class="s" id="bioNote">${lock.bio ? 'On for this device' : 'Unlock with this device’s biometrics'}</div></div><label class="sw"><input type="checkbox" id="sBio" ${lock.bio ? 'checked' : ''}><i></i></label></div>
+    ${set('Lock now', '', '🔒', 'id="sLock"')}
+    ${set('Encryption passphrase', S.meta.encSalt ? (S.encKey ? 'Unlocked for this session' : 'Set — locked') : 'Not set — optional, for Identity documents', S.meta.encSalt ? (S.encKey ? '<span class="pill green">open</span>' : '<span class="pill grey">locked</span>') : '', 'id="sEnc"')}
+    <div class="item"><div class="grow"><div class="t">Keep opened files on this device</div><div class="s">Faster and works offline. Off = files stay only in Drive.</div></div><label class="sw"><input type="checkbox" id="sOffline" ${LS.get('keepOffline', false) ? 'checked' : ''}><i></i></label></div>
+  </div></div>
+  <div class="section"><div class="hd"><h2>Categories</h2><button class="btn sm" id="addCat">+ Add</button></div><div class="list">
+    ${S.cats.map(c => `<button class="item" data-cat="${esc(c.Name)}">${catIcon(c.Name, 1)}<div class="grow"><div class="t">${esc(c.Name)}</div><div class="s">Remind ${esc(c.LeadDays)} days before${c.Encrypt ? ' · encryption ' + (c.Encrypt === 'always' ? 'always' : 'optional') : ''}${c.Fields ? ' · ' + esc(c.Fields) : ''}</div></div><span class="muted">›</span></button>`).join('')}
+  </div></div>
+  <div class="section"><div class="hd"><h2>People</h2><button class="btn sm" id="addPerson">+ Add</button></div><div class="list">
+    ${S.people.map(p => `<button class="item" data-person="${esc(p.Name)}"><span class="cicon sm" style="background:${esc(p.Colour)}33;color:${esc(p.Colour)}">${esc((p.Name || '?')[0])}</span><div class="grow"><div class="t">${esc(p.Name)}</div><div class="s">${esc(p.Relationship || '')}</div></div><span class="muted">›</span></button>`).join('')}
+  </div></div>
+  <div class="section"><div class="hd"><h2>Linked apps</h2></div><div class="list">
+    ${['garage', 'ledger', 'flow'].map(a => set(a[0].toUpperCase() + a.slice(1), links[a] && links[a].url ? 'Connected' + (a === 'flow' && links[a].tasks ? ' · creates renewal tasks' : '') : a === 'garage' ? 'Link car documents by car' : a === 'ledger' ? 'Receipts, payslips, statements as read-only references' : 'Renewal tasks (#personal !high)', '', `data-link="${a}"`)).join('')}
+    ${links.ledger && links.ledger.url ? set('Import from Ledger', 'Pick receipts / payslips to reference (no duplicate files)', '', 'id="sLedger"') : ''}
+  </div></div>
+  <div class="section"><div class="hd"><h2>Backup & recovery</h2></div><div class="list">
+    ${set('Backup now', 'Daily JSON to Drive › Vault/Backups (last 30). Last: ' + esc(S.meta.lastBackup ? ago(S.meta.lastBackup) : 'never'), '', 'id="sBackup"')}
+    ${set('Export JSON', 'Download everything in the Sheet', '', 'id="sExport"')}
+    ${set('Import JSON', 'Merge a Vault export (newer rows win)', '', 'id="sImport"')}
+    ${set('Device snapshots', 'Last 14 days kept on this device', '', 'id="sSnaps"')}
+    ${set('Trash', 'Deleted documents — restore within 30 days', '', 'id="sTrash"')}
+    ${set('Active share links', 'Auto-revoked after 24 h', '', 'id="sShares"')}
+    ${set('Rebuild calendar reminders', 'Re-create all events in the “Vault” calendar', '', 'id="sRem"')}
+    ${set('Activity log', 'Recent entries from _Log', '', 'id="sLog"')}
+  </div></div>
+  <div class="section"><div class="hd"><h2>This device</h2></div><div class="list">
+    ${set('Forget this device', 'Removes the key, PIN and cached data here. Drive and the Sheet are untouched.', '<span style="color:#FF8A82">⏏</span>', 'id="sForget"')}
+  </div></div>
+  <p class="tiny dim" style="text-align:center;margin-top:18px">Vault ${APP_VERSION} · bridge ${esc(S.meta.version || '?')} · ${docList().length} documents</p>`;
+}
+afterRender.settings = () => {
+  const on = (id, fn) => { const el = $('#' + id); if (el) el.onclick = fn; };
+  on('sSync', () => sync({ full: true, quiet: false }));
+  on('sChecks', runChecks);
+  on('sConn', () => showConnect(true));
+  on('sPin', () => Lock.changePin());
+  $('#sIdle').onchange = e => { Lock.save({ idle: Number(e.target.value) }); toast('Auto-lock after ' + e.target.value + ' min'); };
+  $('#sBio').onchange = async e => { if (e.target.checked) { if (!await Lock.enrollBio()) e.target.checked = false; } else { Lock.save({ bio: null }); toast('Biometric unlock off'); } };
+  on('sLock', () => Lock.lock());
+  on('sEnc', encryptionSheet);
+  $('#sOffline').onchange = async e => { LS.set('keepOffline', e.target.checked); if (!e.target.checked) { for (const k of await DB.keys('blobs')) if (String(k).startsWith('file:')) await DB.del(k, 'blobs'); toast('Offline files removed from this device'); } };
+  on('addCat', () => editCategory(null));
+  $$('[data-cat]').forEach(b => b.onclick = () => editCategory(S.cats.find(c => c.Name === b.dataset.cat)));
+  on('addPerson', () => editPerson(null));
+  $$('[data-person]').forEach(b => b.onclick = () => editPerson(S.people.find(p => p.Name === b.dataset.person)));
+  $$('[data-link]').forEach(b => b.onclick = () => editLink(b.dataset.link));
+  on('sLedger', importLedger);
+  on('sBackup', async () => { try { const r = await api('backupNow'); toast('Backup saved: ' + r.name); sync(); } catch (e) { toast(errText(e), { error: true }); } });
+  on('sExport', async () => { try { const r = await api('exportAll'); download('vault-export-' + todayStr() + '.json', new Blob([JSON.stringify(r.data, null, 1)], { type: 'application/json' })); } catch (e) { toast(errText(e), { error: true }); } });
+  on('sImport', () => pick('#pickJson', async files => {
+    try {
+      const data = JSON.parse(await files[0].text());
+      if (data.app !== 'vault') throw new Error('Not a Vault export');
+      if (!await ask('Import backup?', `${(data.tabs.Documents || []).length} documents from ${esc(String(data.exported || '').slice(0, 10))}. Newer rows win; a safety backup is made first.`, 'Import')) return;
+      const r = await api('importAll', { data }, { timeout: 180000 }); toast(`Imported: ${r.added} added, ${r.updated} updated`); sync({ full: true });
+    } catch (e) { toast(errText(e), { error: true }); }
+  }));
+  on('sSnaps', snapshotsSheet);
+  on('sTrash', trashSheet);
+  on('sShares', sharesSheet);
+  on('sRem', async () => { if (!await ask('Rebuild reminders?', 'Deletes and re-creates every Vault calendar event. Takes a moment.', 'Rebuild')) return; try { const r = await api('rebuildReminders', {}, { timeout: 300000 }); toast(`Rebuilt for ${r.count} documents`); } catch (e) { toast(errText(e), { error: true }); } });
+  on('sLog', logSheet);
+  on('sForget', forgetDevice);
+};
+function colourInput(v) { return `<input class="in" type="color" name="Colour" value="${esc(v || '#9AA0A6')}" style="padding:4px;height:46px">`; }
+function editCategory(c) {
+  const isNew = !c; c = c || { Name: '', Icon: '📁', Colour: '#9AA0A6', LeadDays: 30, Fields: '', Encrypt: '' };
+  const s = sheet(`<h2>${isNew ? 'New category' : 'Edit category'}</h2>
+    <div class="grid2"><label class="f"><span>Name</span><input class="in" name="Name" value="${esc(c.Name)}"></label><label class="f"><span>Icon (emoji)</span><input class="in" name="Icon" value="${esc(c.Icon)}" maxlength="4"></label></div>
+    <div class="grid2"><label class="f"><span>Colour</span>${colourInput(c.Colour)}</label><label class="f"><span>Remind days before</span><input class="in" type="number" name="LeadDays" value="${esc(c.LeadDays)}"></label></div>
+    <label class="f"><span>Extra fields (comma separated)</span><input class="in" name="Fields" value="${esc(c.Fields)}" placeholder="Purchase price, Shop"></label>
+    <label class="f"><span>Client-side encryption</span><select class="in" name="Encrypt"><option value="" ${!c.Encrypt ? 'selected' : ''}>Off</option><option value="ask" ${c.Encrypt === 'ask' ? 'selected' : ''}>Optional per document</option><option value="always" ${c.Encrypt === 'always' ? 'selected' : ''}>Always</option></select></label>
+    ${!isNew ? '<p class="tiny muted">Renaming also renames the Drive folder and refiles its documents.</p>' : ''}
+    <div class="btns" style="margin-top:14px"><button class="btn" data-close>Cancel</button><button class="btn primary" id="cSave">Save</button></div>`);
+  $('#cSave', s.el).onclick = async () => {
+    const g = n => $(`[name=${n}]`, s.el).value;
+    try { $('#cSave', s.el).disabled = true; const r = await api('saveCategory', { category: { original: c.Name, Name: g('Name'), Icon: g('Icon'), Colour: g('Colour'), LeadDays: g('LeadDays'), Fields: g('Fields'), Encrypt: g('Encrypt') } }, { timeout: 180000 });
+      S.cats = r.categories; persist(); s.close(); toast('Category saved'); sync();
+    } catch (e) { $('#cSave', s.el).disabled = false; toast(errText(e), { error: true }); }
+  };
+}
+function editPerson(p) {
+  const isNew = !p; p = p || { Name: '', Relationship: '', Colour: '#5B8DEF' };
+  const s = sheet(`<h2>${isNew ? 'New person' : 'Edit person'}</h2>
+    <label class="f"><span>Name</span><input class="in" name="Name" value="${esc(p.Name)}"></label>
+    <div class="grid2"><label class="f"><span>Relationship</span><input class="in" name="Relationship" value="${esc(p.Relationship)}"></label><label class="f"><span>Colour</span>${colourInput(p.Colour)}</label></div>
+    <div class="btns" style="margin-top:14px">${!isNew ? '<button class="btn danger" id="pDel">Remove</button>' : '<button class="btn" data-close>Cancel</button>'}<button class="btn primary" id="pSave">Save</button></div>`);
+  const g = n => $(`[name=${n}]`, s.el).value;
+  $('#pSave', s.el).onclick = async () => { try { const r = await api('savePerson', { person: { original: p.Name, Name: g('Name'), Relationship: g('Relationship'), Colour: g('Colour') } }, { timeout: 180000 }); S.people = r.people; persist(); s.close(); sync(); } catch (e) { toast(errText(e), { error: true }); } };
+  const del = $('#pDel', s.el);
+  if (del) del.onclick = async () => { if (!await ask('Remove ' + esc(p.Name) + '?', 'Their documents keep the owner name.', 'Remove', true)) return; try { const r = await api('deletePerson', { name: p.Name }); S.people = r.people; persist(); s.close(); render(); } catch (e) { toast(errText(e), { error: true }); } };
+}
+async function runChecks() {
+  const s = sheet(`<h2>Run checks</h2><div id="chk" class="muted small" style="margin-top:8px">Running…</div><button class="btn block" style="margin-top:14px" data-close>Close</button>`);
+  const rows = [];
+  const add = (name, ok, detail = '') => { rows.push({ name, ok, detail }); paint(); };
+  const paint = () => { $('#chk', s.el).innerHTML = rows.map(r => `<div class="toggle"><div class="grow"><div>${esc(r.name)}</div>${r.detail ? `<div class="tiny muted">${esc(r.detail)}</div>` : ''}</div><b style="color:${r.ok === null ? 'var(--amber)' : r.ok ? 'var(--green)' : 'var(--red)'}">${r.ok === null ? '!' : r.ok ? '✓' : '✗'}</b></div>`).join(''); };
+  add('Bridge URL looks right', /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(S.url));
+  add('Online', navigator.onLine);
+  add('IndexedDB', await DB.keys().then(() => true).catch(() => false));
+  add('Web Crypto (AES-GCM)', !!(crypto && crypto.subtle));
+  add('Service worker (offline)', !!(navigator.serviceWorker && navigator.serviceWorker.controller), navigator.serviceWorker ? '' : 'not supported');
+  try { const p = navigator.storage && navigator.storage.persisted ? await navigator.storage.persisted() : false; add('Persistent storage', p ? true : null, p ? '' : 'Browser may evict the offline cache'); } catch (e) {}
+  add('App lock PIN set', !!(Lock.cfg() || {}).hash);
+  add('Pending uploads/changes', S.outbox.length === 0 ? true : null, S.outbox.length ? S.outbox.length + ' waiting' + (S.outbox[0].error ? ' — ' + S.outbox[0].error : '') : 'none');
+  const t0 = Date.now();
+  try { const r = await api('ping'); add('Bridge reachable + key valid', true, `v${r.version} · ${Date.now() - t0} ms`); }
+  catch (e) { add('Bridge reachable + key valid', false, errText(e)); return; }
+  try { const r = await api('checks', {}, { timeout: 120000 }); r.checks.forEach(c => add('Server: ' + c.name, c.ok, c.detail)); }
+  catch (e) { add('Server checks', false, errText(e)); }
+}
+async function listSheet(title, action, rowFn, empty) {
+  const s = sheet(`<h2>${title}</h2><div id="ls" class="muted small" style="margin-top:8px">Loading…</div><button class="btn block" style="margin-top:14px" data-close>Close</button>`);
+  const load = async () => {
+    try { const r = await api(action); $('#ls', s.el).innerHTML = r.items.length ? `<div class="list">${r.items.map(rowFn).join('')}</div>` : `<div class="empty">${empty}</div>`; return r; }
+    catch (e) { $('#ls', s.el).textContent = errText(e); }
+  };
+  await load(); return { s, load };
+}
+async function trashSheet() {
+  const { s, load } = await listSheet('Trash', 'listTrash', it => `<div class="item"><div class="grow"><div class="t ellipsis">${esc(it.Title)}</div><div class="s">Deleted ${esc(ago(it.DeletedAt))} · purged ${esc(fmtDate(it.purgeOn.slice(0, 10)))}</div></div><button class="btn sm" data-restore="${esc(it.ID)}">Restore</button></div>`, 'Trash is empty.');
+  s.el.addEventListener('click', async e => {
+    const b = e.target.closest('[data-restore]'); if (!b) return;
+    b.disabled = true;
+    try { const r = await api('restoreDoc', { id: b.dataset.restore }); S.docs[r.doc.ID] = r.doc; persist(); toast('Restored “' + r.doc.Title + '”'); load(); }
+    catch (er) { b.disabled = false; toast(errText(er), { error: true }); }
+  });
+}
+async function sharesSheet() {
+  const { s, load } = await listSheet('Active share links', 'listShares', it => `<div class="item"><div class="grow"><div class="t ellipsis">${esc((S.docs[it.DocID] || {}).Title || it.DocID)}</div><div class="s">until ${esc(new Date(it.Expires).toLocaleString())}</div></div><button class="btn sm danger" data-revoke="${esc(it.ID)}">Revoke</button></div>`, 'No active links.');
+  s.el.addEventListener('click', async e => { const b = e.target.closest('[data-revoke]'); if (!b) return; try { await api('revokeShare', { id: b.dataset.revoke }); toast('Revoked'); load(); } catch (er) { toast(errText(er), { error: true }); } });
+}
+function logSheet() { listSheet('Activity log', 'log', r => `<div class="item" style="min-height:0"><div class="grow"><div class="small"><b>${esc(r[1])}</b> ${esc(r[3])}</div><div class="tiny muted">${esc(r[0].replace('T', ' ').slice(0, 16))}${r[2] ? ' · ' + esc(r[2]) : ''}</div></div></div>`, 'No entries.'); }
+async function snapshotsSheet() {
+  const keys = (await DB.keys()).filter(k => String(k).startsWith('snap:')).sort().reverse();
+  const s = sheet(`<h2>Device snapshots</h2><p class="small muted">A copy of the index saved on this device once a day. Restore pushes it back to the Sheet (newer rows in the Sheet are kept).</p>
+    <div class="list" style="margin-top:10px">${keys.map(k => `<div class="item"><div class="grow"><div class="t">${esc(fmtDate(k.slice(5)))}</div></div><button class="btn sm" data-dl="${esc(k)}">Download</button><button class="btn sm" data-rs="${esc(k)}">Restore</button></div>`).join('') || '<div class="empty">No snapshots yet.</div>'}</div>
+    <button class="btn block" style="margin-top:14px" data-close>Close</button>`);
+  const toExport = snap => ({ app: 'vault', version: APP_VERSION, exported: snap.at, tabs: { Documents: Object.values(snap.docs).map(toRow), Categories: snap.cats, People: snap.people } });
+  s.el.addEventListener('click', async e => {
+    const dl = e.target.closest('[data-dl]'), rs = e.target.closest('[data-rs]');
+    if (dl) { const snap = await DB.get(dl.dataset.dl); download('vault-snapshot-' + dl.dataset.dl.slice(5) + '.json', new Blob([JSON.stringify(toExport(snap))], { type: 'application/json' })); }
+    if (rs) {
+      if (!await ask('Restore snapshot?', 'Documents from ' + esc(fmtDate(rs.dataset.rs.slice(5))) + ' are merged back into the Sheet.', 'Restore')) return;
+      try { const snap = await DB.get(rs.dataset.rs); const r = await api('importAll', { data: toExport(snap) }, { timeout: 180000 }); toast(`Restored: ${r.added} added, ${r.updated} updated`); sync({ full: true }); } catch (er) { toast(errText(er), { error: true }); }
+    }
+  });
+}
+function toRow(d) {
+  const o = Object.assign({}, d); delete o._local;
+  o.Files = JSON.stringify((d.Files || []).filter(f => !f.pending)); o.Extra = JSON.stringify(d.Extra || {});
+  o.Pinned = d.Pinned ? 'true' : 'false'; o.Encrypted = d.Encrypted ? 'true' : 'false'; o.RenewalLeadDays = d.RenewalLeadDays === '' ? '' : String(d.RenewalLeadDays);
+  return o;
+}
+async function forgetDevice() {
+  if (!await ask('Forget this device?', 'This removes the app key, PIN, cached index and offline files from <b>this device only</b>. Everything in Drive and the Sheet stays. You will need the app key to reconnect.', 'Forget', true)) return;
+  if (S.outbox.length && !await ask('Unsynced changes', S.outbox.length + ' change(s) have not reached the bridge yet and will be lost.', 'Forget anyway', true)) return;
+  await DB.clear('kv').catch(() => {}); await DB.clear('blobs').catch(() => {});
+  ['cfg', 'lock', 'ui', 'keepOffline'].forEach(k => LS.del(k));
+  location.hash = ''; location.reload();
+}
+
+/* ---- encryption ---- */
+async function needEncKey() {
+  if (S.encKey) return S.encKey;
+  if (!S.meta.encSalt) { toast('Set an encryption passphrase in Settings › Security first', { error: true }); return null; }
+  for (let i = 0; i < 3; i++) {
+    const pass = await askText('Encryption passphrase', { label: 'Passphrase', type: 'password', ok: 'Unlock', note: 'Needed to open encrypted files on this device. Kept in memory until the app locks.' });
+    if (pass === null) return null;
+    try {
+      const key = await Crypto.deriveAes(pass, S.meta.encSalt);
+      if (await Crypto.decText(key, S.meta.encCheck) !== 'vault-ok') throw new Error();
+      S.encKey = key; return key;
+    } catch (e) { toast('Wrong passphrase', { error: true }); }
+  }
+  return null;
+}
+async function encryptionSheet() {
+  if (S.meta.encSalt) {
+    if (S.encKey) { if (await ask('Lock encrypted files?', 'Forget the passphrase key for this session.', 'Lock')) { S.encKey = null; for (const k in plainNums) delete plainNums[k]; render(); } }
+    else { await needEncKey(); render(); }
+    return;
+  }
+  const s = sheet(`<h2>Set encryption passphrase</h2>
+    <div class="card small" style="border-color:rgba(229,83,75,.45);margin-top:8px"><b style="color:#FF8A82">Read this:</b> files in encrypted documents are scrambled on this device before upload. Google Drive only ever holds ciphertext. <b>If you lose this passphrase, those files are gone for good</b> — nobody, including you, can recover them. Write it down somewhere safe (not in Vault).</div>
+    <label class="f"><span>Passphrase (12+ characters)</span><input class="in" type="password" id="ep1" autocomplete="new-password"></label>
+    <label class="f"><span>Repeat</span><input class="in" type="password" id="ep2" autocomplete="new-password"></label>
+    <label class="row small" style="margin-top:12px"><input type="checkbox" id="epOk"> I understand a lost passphrase means lost files.</label>
+    <div class="btns" style="margin-top:14px"><button class="btn" data-close>Cancel</button><button class="btn primary" id="epSave">Set passphrase</button></div>`);
+  $('#epSave', s.el).onclick = async () => {
+    const a = $('#ep1', s.el).value, b = $('#ep2', s.el).value;
+    if (a.length < 12) return toast('Use at least 12 characters', { error: true });
+    if (a !== b) return toast('Passphrases do not match', { error: true });
+    if (!$('#epOk', s.el).checked) return toast('Tick the box to confirm', { error: true });
+    try {
+      const salt = b64FromBuf(crypto.getRandomValues(new Uint8Array(16)));
+      const key = await Crypto.deriveAes(a, salt);
+      const check = await Crypto.encText(key, 'vault-ok');
+      const r = await api('setEnc', { salt, check });
+      S.meta = r.meta; S.encKey = key; persist(); s.close(); toast('Encryption ready'); render();
+    } catch (e) { toast(errText(e), { error: true }); }
+  };
+}
+
+/* ============================== 14. lock ============================== */
+const Lock = {
+  cfg() { return LS.get('lock', null); },
+  save(p) { LS.set('lock', Object.assign({}, this.cfg() || {}, p)); },
+  last: Date.now(), hiddenAt: 0, buf: '',
+  async hashPin(pin, salt) { const bits = await Crypto.pbkdf2Bits('vault-pin:' + pin, bufFromB64(salt), 150000); return b64FromBuf(bits); },
+  lock() {
+    S.encKey = null; for (const k in plainNums) delete plainNums[k]; S.files.clear(); closeViewer();
+    $$('.scrim').forEach(x => x.remove());
+    document.body.classList.add('locked'); $('#app').innerHTML = '';
+    this.show('unlock');
+  },
+  unlocked() {
+    $('#lock').classList.add('hidden'); $('#lock').innerHTML = '';
+    document.body.classList.remove('locked'); $('#tabs').classList.remove('hidden');
+    this.last = Date.now(); this.save({ fails: 0, until: 0 });
+    render(); updateBadge();
+    if (Date.now() - S.lastSync > 30000) sync();
+  },
+  show(mode, ctx = {}) {
+    const c = this.cfg() || {};
+    const L = $('#lock'); L.classList.remove('hidden'); this.buf = '';
+    const titles = { unlock: ['Vault is locked', 'Enter your 6-digit PIN'], set: ['Create a PIN', 'Six digits, asked when Vault opens and after idle'], confirm: ['Confirm PIN', 'Enter it once more'], old: ['Current PIN', 'Enter your current PIN'] };
+    const [t, sub] = titles[mode];
+    L.innerHTML = `<img class="logo" src="favicon.svg" alt=""><h1 style="font-size:22px">${t}</h1><div class="muted small" id="lkSub" style="margin-top:4px;text-align:center">${sub}</div>
+      <div class="pindots" id="dots6">${'<i></i>'.repeat(6)}</div>
+      <div class="pad">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button data-k="${n}">${n}</button>`).join('')}
+        <button class="fn" data-k="bio">${mode === 'unlock' && c.bio ? 'Face ID' : ''}</button><button data-k="0">0</button><button class="fn" data-k="del">⌫</button></div>
+      ${mode === 'unlock' ? '<button class="btn ghost sm" id="forgot" style="margin-top:18px">Forgot PIN?</button>' : mode === 'old' || ctx.cancel ? '<button class="btn ghost sm" id="lkCancel" style="margin-top:18px">Cancel</button>' : ''}`;
+    const dots = () => $$('#dots6 i').forEach((d, i) => d.classList.toggle('on', i < this.buf.length));
+    const press = async k => {
+      if (k === 'bio') { if (mode === 'unlock' && c.bio) this.bio(); return; }
+      if (k === 'del') { this.buf = this.buf.slice(0, -1); dots(); return; }
+      if (this.buf.length >= 6) return;
+      this.buf += k; dots();
+      if (this.buf.length === 6) { const pin = this.buf; setTimeout(() => this.submit(mode, pin, ctx), 80); }
+    };
+    $$('[data-k]', L).forEach(b => b.onclick = () => press(b.dataset.k));
+    L.onkeydown = null;
+    document.onkeydown = e => { if (L.classList.contains('hidden')) return; if (/^\d$/.test(e.key)) press(e.key); if (e.key === 'Backspace') press('del'); };
+    const f = $('#forgot'); if (f) f.onclick = () => this.forgot();
+    const cn = $('#lkCancel'); if (cn) cn.onclick = () => { L.classList.add('hidden'); L.innerHTML = ''; document.body.classList.remove('locked'); render(); };
+    if (mode === 'unlock' && c.bio && !ctx.noAuto && document.visibilityState === 'visible') setTimeout(() => this.bio(true), 300);
+  },
+  shake(msg) { const d = $('#dots6'); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake'); if (msg) $('#lkSub').textContent = msg; this.buf = ''; setTimeout(() => $$('#dots6 i').forEach(i => i.classList.remove('on')), 300); },
+  async submit(mode, pin, ctx) {
+    const c = this.cfg() || {};
+    if (mode === 'unlock' || mode === 'old') {
+      if (c.until && Date.now() < c.until) return this.shake(`Too many tries — wait ${Math.ceil((c.until - Date.now()) / 1000)} s`);
+      if (await this.hashPin(pin, c.salt) === c.hash) { if (mode === 'old') return this.show('set', { cancel: true }); return this.unlocked(); }
+      const fails = (c.fails || 0) + 1;
+      const until = fails >= 5 ? Date.now() + Math.min(900, 30 * 2 ** (fails - 5)) * 1000 : 0;
+      this.save({ fails, until });
+      return this.shake(fails >= 5 ? `Wrong PIN. Locked for ${Math.round((until - Date.now()) / 1000)} s` : `Wrong PIN (${5 - fails} left before a pause)`);
+    }
+    if (mode === 'set') return this.show('confirm', { first: pin, cancel: ctx.cancel });
+    if (mode === 'confirm') {
+      if (pin !== ctx.first) { this.show('set', { cancel: ctx.cancel }); return setTimeout(() => this.shake('PINs did not match — try again'), 50); }
+      const salt = b64FromBuf(crypto.getRandomValues(new Uint8Array(16)));
+      this.save({ hash: await this.hashPin(pin, salt), salt, idle: (c.idle || 5), fails: 0, until: 0 });
+      toast('PIN set');
+      this.unlocked();
+      if (!c.hash && await this.bioAvailable()) {
+        if (await ask('Use Face ID / fingerprint?', 'Unlock Vault with this device’s biometrics. Your PIN still works as a backup.', 'Turn on')) this.enrollBio();
+      }
+    }
+  },
+  changePin() { document.body.classList.add('locked'); this.show('old'); },
+  async forgot() {
+    const key = await askText('Reset PIN', { label: 'App key', type: 'password', note: 'Enter the 48-character app key from your Apps Script setup log to set a new PIN.', ok: 'Verify' });
+    if (key === null) return;
+    if (key.trim() === S.key) { this.save({ hash: null, fails: 0, until: 0 }); this.show('set'); }
+    else toast('That is not the app key for this device', { error: true });
+  },
+  async bioAvailable() { try { return !!(window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); } catch (e) { return false; } },
+  async enrollBio() {
+    if (!await this.bioAvailable()) { toast('Biometric unlock is not available on this device/browser', { error: true }); return false; }
+    try {
+      const cred = await navigator.credentials.create({ publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: 'Vault' },
+        user: { id: crypto.getRandomValues(new Uint8Array(16)), name: 'vault-' + location.hostname, displayName: 'Vault' },
+        pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+        authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' }, timeout: 60000, attestation: 'none',
+      } });
+      this.save({ bio: b64FromBuf(cred.rawId) }); toast('Biometric unlock on'); return true;
+    } catch (e) { toast('Biometric setup cancelled', { error: true }); return false; }
+  },
+  async bio(auto) {
+    const c = this.cfg() || {}; if (!c.bio) return;
+    try {
+      await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ type: 'public-key', id: bufFromB64(c.bio) }], userVerification: 'required', timeout: 60000 } });
+      this.unlocked();
+    } catch (e) { if (!auto) toast('Biometric check failed — use your PIN', { error: true }); }
+  },
+  watch() {
+    ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(ev => addEventListener(ev, () => { this.last = Date.now(); }, { passive: true, capture: true }));
+    setInterval(() => { if (!document.body.classList.contains('locked') && (this.cfg() || {}).hash && Date.now() - this.last > ((this.cfg() || {}).idle || 5) * 60000) this.lock(); }, 10000);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') { this.hiddenAt = Date.now(); document.body.classList.add('privacy'); }
+      else {
+        document.body.classList.remove('privacy');
+        const idle = ((this.cfg() || {}).idle || 5) * 60000;
+        if (!document.body.classList.contains('locked') && (this.cfg() || {}).hash && this.hiddenAt && Date.now() - this.hiddenAt > idle) this.lock();
+        else if (!document.body.classList.contains('locked') && Date.now() - S.lastSync > 60000) sync();
+      }
+    });
+  },
+};
+
+/* ============================== 15. linked apps ============================== */
+const FLOW_ADD_ACTION = 'add'; // change here if Flow's bridge names its create action differently
+function normItem(it) {
+  const pick = (...ks) => { for (const k of ks) if (it[k] !== undefined && it[k] !== '') return it[k]; return ''; };
+  return {
+    id: String(pick('id', 'ID', 'carId', 'txnId', 'taskId', 'Id')),
+    label: String(pick('title', 'Title', 'name', 'Name', 'description', 'Description', 'desc', 'merchant', 'Merchant', 'plate', 'Plate', 'text')) || '(untitled)',
+    sub: [pick('date', 'Date', 'due', 'Due'), pick('amount', 'Amount'), pick('plate', 'Plate', 'category', 'Category')].filter(Boolean).join(' · '),
+    driveId: String(pick('driveId', 'fileId', 'receiptId', 'ReceiptID', 'receiptDriveId', 'attachmentId', 'DriveID')),
+    mime: String(pick('mime', 'mimeType', 'Mime')), date: String(pick('date', 'Date')).slice(0, 10),
+  };
+}
+async function linkedList(app) {
+  const l = (S.meta.links || {})[app]; if (!l || !l.url) throw new Error('Set up ' + app + ' in Settings › Linked apps');
+  const r = await api('list', {}, { url: l.url, key: l.key, timeout: 60000 });
+  return (r.items || r.data || r.rows || r.cars || r.transactions || r.tasks || []).map(normItem).filter(x => x.id);
+}
+async function pickLinked(app, cb) {
+  const s = sheet(`<h2>Pick from ${esc(app)}</h2><input class="in" id="lkQ" placeholder="Filter" style="margin-top:8px"><div id="lkL" class="small muted" style="margin-top:10px">Loading…</div><button class="btn block" style="margin-top:14px" data-close>Close</button>`, { focus: false });
+  try {
+    const items = await linkedList(app);
+    const paint = () => { const q = $('#lkQ', s.el).value.toLowerCase(); $('#lkL', s.el).innerHTML = `<div class="list">${items.filter(i => (i.label + i.sub + i.id).toLowerCase().includes(q)).slice(0, 100).map(i => `<button class="item" data-id="${esc(i.id)}"><div class="grow"><div class="t ellipsis">${esc(i.label)}</div><div class="s">${esc(i.sub)} · ${esc(i.id)}</div></div></button>`).join('') || '<div class="empty">Nothing found</div>'}</div>`; };
+    $('#lkQ', s.el).oninput = paint; paint();
+    s.el.addEventListener('click', e => { const b = e.target.closest('[data-id]'); if (b) { cb(b.dataset.id); s.close(); } });
+  } catch (e) { $('#lkL', s.el).textContent = errText(e); }
+}
+function editLink(app) {
+  const l = (S.meta.links || {})[app] || {};
+  const name = app[0].toUpperCase() + app.slice(1);
+  const s = sheet(`<h2>${name}</h2><p class="small muted">Paste ${name}'s Apps Script web-app URL and its read-only link key. Vault calls its <code>list</code> action directly from this device.</p>
+    <label class="f"><span>${name} bridge URL</span><input class="in" id="lU" value="${esc(l.url || '')}" placeholder="https://script.google.com/macros/s/…/exec"></label>
+    <label class="f"><span>${name} key</span><input class="in" id="lK" type="password" value="${esc(l.key || '')}"></label>
+    <label class="f"><span>${name} app page (optional, for ↗ links)</span><input class="in" id="lP" value="${esc(l.page || '')}" placeholder="https://syahman312.github.io/${app}/"></label>
+    ${app === 'flow' ? `<div class="toggle" style="margin-top:8px"><div class="grow"><div>Create renewal tasks</div><div class="tiny muted">“🔐 Renew: …” #personal !high, due on the reminder date. Needs Flow's full key.</div></div><label class="sw"><input type="checkbox" id="lT" ${l.tasks ? 'checked' : ''}><i></i></label></div>` : ''}
+    <div class="btns" style="margin-top:14px"><button class="btn" id="lTest">Test</button><button class="btn primary" id="lSave">Save</button></div>
+    <p class="tiny dim" style="margin-top:12px">To let ${name} read Vault, give it this bridge URL and Vault's <b>link key</b> (printed by setup(); rotate with rotateLinkKey()).</p>`);
+  const val = () => ({ url: $('#lU', s.el).value.trim(), key: $('#lK', s.el).value.trim(), page: $('#lP', s.el).value.trim(), tasks: !!($('#lT', s.el) || {}).checked });
+  $('#lTest', s.el).onclick = async () => { try { const r = await api('list', {}, { url: val().url, key: val().key, timeout: 45000 }); const n = (r.items || r.data || r.rows || r.cars || r.transactions || r.tasks || []).length; toast(`${name} answered: ${n} items`); } catch (e) { toast(name + ': ' + errText(e), { error: true }); } };
+  $('#lSave', s.el).onclick = async () => {
+    const links = Object.assign({}, S.meta.links || {}, { [app]: val() });
+    try { const r = await api('setLinks', { links }); S.meta = r.meta; persist(); s.close(); toast(name + ' saved'); render(); } catch (e) { toast(errText(e), { error: true }); }
+  };
+}
+async function importLedger() {
+  const s = sheet(`<h2>Import from Ledger</h2><p class="small muted">Only items with a Drive file are shown. Vault stores the Drive ID as a read-only reference — no file is copied or moved.</p>
+    <div class="grid2"><label class="f"><span>Category</span><select class="in" id="liCat">${S.cats.map(c => `<option ${c.Name === 'Finance & Tax' ? 'selected' : ''}>${esc(c.Name)}</option>`).join('')}</select></label>
+    <label class="f"><span>Owner</span><select class="in" id="liOwn">${S.people.map(p => `<option>${esc(p.Name)}</option>`).join('')}</select></label></div>
+    <div id="liL" class="small muted" style="margin-top:10px">Loading…</div>
+    <div class="btns" style="margin-top:14px"><button class="btn" data-close>Close</button><button class="btn primary" id="liGo" disabled>Import selected</button></div>`, { focus: false });
+  try {
+    const have = new Set(docList().filter(d => d.LinkedApp === 'ledger').map(d => d.LinkedID));
+    const items = (await linkedList('ledger')).filter(i => i.driveId && !have.has(i.id));
+    $('#liL', s.el).innerHTML = items.length ? `<div class="list">${items.slice(0, 300).map((i, n) => `<label class="item"><input type="checkbox" data-n="${n}"><div class="grow"><div class="t ellipsis">${esc(i.label)}</div><div class="s">${esc(i.sub)}</div></div></label>`).join('')}</div>` : '<div class="empty">Nothing new with a file attached.</div>';
+    s.el.addEventListener('change', () => { $('#liGo', s.el).disabled = !$$('[data-n]:checked', s.el).length; });
+    $('#liGo', s.el).onclick = () => {
+      const chosen = $$('[data-n]:checked', s.el).map(c => items[+c.dataset.n]);
+      chosen.forEach(i => {
+        const d = Object.assign(EMPTY_DOC(), { ID: uid('d'), Title: i.label, Category: $('#liCat', s.el).value, Owner: $('#liOwn', s.el).value, IssueDate: /^\d{4}-\d{2}-\d{2}$/.test(i.date) ? i.date : '', Tags: 'ledger', LinkedApp: 'ledger', LinkedID: i.id, Created: new Date().toISOString(),
+          Files: [{ driveId: i.driveId, name: i.label, mime: i.mime || '', size: 0, ref: true }] });
+        saveLocal(d);
+      });
+      s.close(); toast(`Imported ${chosen.length} reference${chosen.length === 1 ? '' : 's'} from Ledger`);
+    };
+  } catch (e) { $('#liL', s.el).textContent = errText(e); }
+}
+async function createFlowTask(doc) {
+  const l = (S.meta.links || {}).flow; if (!l || !l.url || !l.tasks) return;
+  const exp = parseYMD(doc.ExpiryDate); if (!exp) return;
+  const due = new Date(exp); due.setDate(due.getDate() - leadOf(doc));
+  const dueStr = due.getFullYear() + '-' + String(due.getMonth() + 1).padStart(2, '0') + '-' + String(due.getDate()).padStart(2, '0');
+  const link = location.origin + location.pathname + '#doc=' + doc.ID;
+  try {
+    await api(FLOW_ADD_ACTION, { task: { title: '🔐 Renew: ' + doc.Title, text: '🔐 Renew: ' + doc.Title + ' #personal !high', tags: ['personal'], priority: 'high', due: dueStr, notes: 'Expires ' + doc.ExpiryDate + '\n' + link, source: 'vault', sourceId: doc.ID } }, { url: l.url, key: l.key, timeout: 45000 });
+    toast('Flow task created');
+  } catch (e) { toast('Flow task not created: ' + errText(e), { error: true }); }
+}
+
+/* ============================== 16. boot ============================== */
+function showConnect(change) {
+  const cur = { url: S.url, key: '' };
+  const html = `<div style="width:100%;max-width:420px"><div style="text-align:center"><img class="logo" src="favicon.svg" alt=""><h1>${change ? 'Change connection' : 'Welcome to Vault'}</h1>
+    <p class="muted small">Connect to your own Apps Script bridge. Everything stays in your Google Drive and Sheet.</p></div>
+    <label class="f"><span>Bridge URL (Deploy › Web app URL)</span><input class="in" id="cU" value="${esc(cur.url)}" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" spellcheck="false"></label>
+    <label class="f"><span>App key (48 characters, from the setup log)</span><input class="in" id="cK" type="password" autocomplete="off" spellcheck="false"></label>
+    <button class="btn primary block" id="cGo" style="margin-top:16px">Connect</button>
+    ${change ? '<button class="btn ghost block" id="cCancel" style="margin-top:8px">Cancel</button>' : '<p class="tiny dim" style="text-align:center;margin-top:14px">New here? Follow SETUP.md in the repository.</p>'}
+    <div id="cErr" class="small" style="color:#FF8A82;margin-top:10px;text-align:center"></div></div>`;
+  const L = $('#lock'); L.classList.remove('hidden'); L.innerHTML = html; document.body.classList.add('locked');
+  const cc = $('#cCancel'); if (cc) cc.onclick = () => { L.classList.add('hidden'); document.body.classList.remove('locked'); render(); };
+  $('#cGo').onclick = async () => {
+    const url = $('#cU').value.trim(), key = $('#cK').value.trim();
+    if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(url)) return $('#cErr').textContent = 'That does not look like an Apps Script web-app URL (…/exec).';
+    if (key.length < 32) return $('#cErr').textContent = 'The app key is 48 characters.';
+    $('#cGo').disabled = true; $('#cGo').textContent = 'Connecting…'; $('#cErr').textContent = '';
+    try {
+      await api('ping', {}, { url, key });
+      const changedBridge = url !== S.url;
+      S.url = url; S.key = key; LS.set('cfg', { url, key });
+      if (changedBridge) { S.docs = {}; S.since = ''; S.outbox = []; }
+      try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+      await sync({ full: true });
+      if (!(Lock.cfg() || {}).hash) Lock.show('set'); else Lock.unlocked();
+    } catch (e) { $('#cErr').textContent = errText(e); $('#cGo').disabled = false; $('#cGo').textContent = 'Connect'; }
+  };
+}
+async function boot() {
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  const cfg = LS.get('cfg', null);
+  if (cfg) { S.url = cfg.url; S.key = cfg.key; }
+  try { await loadCache(); } catch (e) { console.warn('cache', e); }
+  Lock.watch();
+  addEventListener('online', () => sync());
+  setInterval(() => { if (document.visibilityState === 'visible' && !document.body.classList.contains('locked')) sync(); }, 5 * 60000);
+  if (!S.url) return showConnect(false);
+  const lock = Lock.cfg();
+  if (!lock || !lock.hash) Lock.show('set'); else Lock.show('unlock');
+}
+boot();
+</script>
+</body>
+</html>
