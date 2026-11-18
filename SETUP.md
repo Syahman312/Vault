@@ -93,6 +93,8 @@ On first open:
 - **iPad / Android tablet**: wider cards in portrait. In landscape you get a side bar, the file preview next to the details, and a two-column Add form.
 - **PC**: side bar and two-column layouts. **Drag files** onto the window or **paste** an image (Ctrl/⌘+V) to add them. Keyboard: `/` search · `n` add · `b` browse · `e` expiring · `s` settings · `Esc` back.
 
+Setting up another device? On one that's already connected, open **Settings → View app key**. It asks for your PIN or Face ID, then shows the key and bridge URL with Copy buttons. Every hidden field in the app has a 👁 button so you can check what you typed.
+
 Each device keeps its own PIN. Forgot it? Tap **Forgot PIN?** and enter the app key to set a new one.
 
 ---
