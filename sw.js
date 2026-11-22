@@ -1,5 +1,5 @@
 /* Vault service worker — offline app shell only. Bridge calls (script.google.com) are never cached. */
-const VERSION = 'vault-v1.3.0';
+const VERSION = 'vault-v1.3.1';
 const SHELL = ['./', './index.html', './manifest.json', './favicon.svg',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png'];
 
