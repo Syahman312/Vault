@@ -74,19 +74,13 @@ nav.tabs a.on{color:var(--accent)}
 nav.tabs a.add .plus{width:44px;height:34px;border-radius:12px;background:var(--accent);color:var(--accentInk);display:grid;place-items:center}
 nav.tabs a.add .plus svg{width:22px;height:22px}
 nav.tabs .badge{position:absolute;top:8px;left:calc(50% + 6px);background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:9px;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px}
-@media (min-width:900px){
-  nav.tabs{top:0;bottom:0;height:100dvh;right:auto;width:92px;border-top:0;border-right:1px solid var(--line);padding:calc(var(--safeT) + 20px) 0 0}
-  nav.tabs .tabs-in{grid-template-columns:1fr;grid-auto-rows:78px;height:auto}
-  #app{padding-left:calc(92px + 28px);padding-right:28px;padding-bottom:40px;max-width:calc(1240px + 92px)}
-  .toast-wrap{bottom:24px!important}
-}
 
 /* ---------- cards / lists ---------- */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
 .card + .card{margin-top:10px}
 .section{margin-top:22px}
 .section > .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.section > .hd h2{font-size:15px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:12px}
+.section > .hd h2{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .list{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line);width:100%;text-align:left;min-height:60px}
 .item:first-child{border-top:0}
@@ -123,12 +117,10 @@ label.f > span{display:block;font-size:12.5px;color:var(--muted);margin:0 0 6px 
 textarea.in{height:auto;min-height:84px;padding:11px 13px;resize:vertical}
 select.in{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 20px,calc(100% - 13px) 20px;background-size:5px 5px;background-repeat:no-repeat;padding-right:32px}
 .in:focus{border-color:var(--accent)}
-input[type=date].in{min-width:0;display:block}
+input[type=date].in{display:block;width:100%;min-width:0;max-width:100%}
 input[type=date].in::-webkit-date-and-time-value{text-align:left}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid2 > *{min-width:0}
-input[type=date].in{width:100%;min-width:0;max-width:100%}
-.grid2 > label.f{margin-top:12px}
 .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
 .toggle:first-child{border-top:0}
 .sw{position:relative;width:48px;height:28px;flex:none}
@@ -286,15 +278,16 @@ body.dragging .drop{display:block;border-color:var(--accent);color:var(--accent)
   :root{--pad:24px}
   #app{max-width:860px}
   nav.tabs .tabs-in{max-width:620px}
-  .cats{grid-template-columns:repeat(4,1fr)}
-  .gridv{grid-template-columns:repeat(3,1fr)}
   .slide{height:min(62vh,560px)}
   .kv{grid-template-columns:130px 1fr}
   h1{font-size:28px}
 }
-/* iPad landscape, PCs */
+/* iPad landscape, PCs: side rail instead of bottom bar */
 @media (min-width:900px){
-  #app{max-width:calc(1180px + 92px + 28px)}
+  nav.tabs{top:0;bottom:0;height:100dvh;right:auto;width:92px;border-top:0;border-right:1px solid var(--line);padding:calc(var(--safeT) + 20px) 0 0}
+  nav.tabs .tabs-in{grid-template-columns:1fr;grid-auto-rows:78px;height:auto;max-width:none}
+  #app{padding-left:calc(92px + 28px);padding-right:28px;padding-bottom:40px;max-width:calc(1180px + 92px + 28px)}
+  .toast-wrap{bottom:24px}
   .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 28px;align-items:start}
   .colR > .section:first-child{margin-top:22px}
   .cats{grid-template-columns:repeat(3,1fr)}
@@ -309,7 +302,6 @@ body.dragging .drop{display:block;border-color:var(--accent);color:var(--accent)
   .formR > .grid2:first-child > label.f:first-child,.formR > .grid2:first-child > label.f:last-child{margin-top:0}
   .setcols{column-count:2;column-gap:24px}
   .setcols > .section{break-inside:avoid;display:inline-block;width:100%;margin-top:0;margin-bottom:22px}
-  .filters{grid-template-columns:repeat(4,1fr)}
   .sheet{max-width:600px}
 }
 @media (min-width:1280px){ .gridv{grid-template-columns:repeat(5,1fr)} .cats{grid-template-columns:repeat(4,1fr)} }
@@ -362,7 +354,7 @@ body.dragging .drop{display:block;border-color:var(--accent);color:var(--accent)
    7 browse · 8 document · 9 expiring · 10 add/edit/renew · 11 scan/pdf
    12 viewer · 13 settings · 14 lock · 15 linked apps · 16 boot
    ========================================================================== */
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.1';
 
 /* ============================== 1. utils ============================== */
 const $ = (s, r = document) => r.querySelector(s);
@@ -372,10 +364,14 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const uid = (p = 'd') => p + Date.now().toString(36) + Array.from(crypto.getRandomValues(new Uint8Array(4)), b => b.toString(36).padStart(2, '0')).join('').slice(0, 6);
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+function todayStr() { return ymd(new Date()); }
 function parseYMD(s) { if (!/^\d{4}-\d{2}-\d{2}$/.test(s || '')) return null; const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
 function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
-function daysLeft(doc) { const e = parseYMD(doc.ExpiryDate); return e ? daysBetween(parseYMD(todayStr()), e) : null; }
+// today's midnight, refreshed when the date string changes (cheap: lists call daysLeft a lot)
+let _today = { s: '', d: null };
+function todayDate() { const s = todayStr(); if (s !== _today.s) _today = { s, d: parseYMD(s) }; return _today.d; }
+function daysLeft(doc) { const e = parseYMD(doc.ExpiryDate); return e ? daysBetween(todayDate(), e) : null; }
 function fmtDate(s) { const d = parseYMD(s); return d ? d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() : ''; }
 function fmtSize(n) { n = Number(n) || 0; return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(0) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
 function ago(iso) {
@@ -562,8 +558,9 @@ async function loadCache() {
   const c = await DB.get('state').catch(() => null);
   if (c) Object.assign(S, { docs: c.docs || {}, cats: c.cats || [], people: c.people || [], meta: c.meta || {}, since: c.since || '', outbox: c.outbox || [] });
 }
-const persist = debounce(() => DB.set('state', { docs: S.docs, cats: S.cats, people: S.people, meta: S.meta, since: S.since, outbox: S.outbox }).catch(console.error), 250);
-function persistNow() { return DB.set('state', { docs: S.docs, cats: S.cats, people: S.people, meta: S.meta, since: S.since, outbox: S.outbox }); }
+const stateSnap = () => ({ docs: S.docs, cats: S.cats, people: S.people, meta: S.meta, since: S.since, outbox: S.outbox });
+function persistNow() { return DB.set('state', stateSnap()); }
+const persist = debounce(() => persistNow().catch(console.error), 250);
 
 let backoff = 0, retryTimer = null;
 function scheduleRetry() {
@@ -578,20 +575,27 @@ async function sync({ full = false, quiet = true } = {}) {
   if (!S.url || S.syncing) return;
   S.syncing = true; setSyncDot();
   try {
+    const hadOutbox = S.outbox.length > 0;
     await flushOutbox();
     const since = full || !S.since ? '' : new Date(new Date(S.since).getTime() - 120000).toISOString();
     const r = await api('sync', { since });
     const pending = new Set(S.outbox.map(o => o.docId));
+    const before = Object.keys(S.docs).length;
+    let changed = hadOutbox || !!r.full || r.docs.length > 0 || r.deleted.length > 0 || !!S.syncErr;
     if (r.full) { const keep = {}; for (const id of pending) if (S.docs[id]) keep[id] = S.docs[id]; S.docs = keep; }
     r.docs.forEach(d => { if (!pending.has(d.ID)) S.docs[d.ID] = d; });
     r.deleted.forEach(id => { if (!pending.has(id)) delete S.docs[id]; });
     if (r.allIds) { const all = new Set(r.allIds); Object.keys(S.docs).forEach(id => { if (!all.has(id) && !pending.has(id)) delete S.docs[id]; }); }
+    const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    const { serverTime: _a, ...metaNew } = r.meta || {}; const { serverTime: _b, ...metaOld } = S.meta || {};
+    if (Object.keys(S.docs).length !== before || !same(S.cats, r.categories) || !same(S.people, r.people) || !same(metaOld, metaNew)) changed = true;
     S.cats = r.categories; S.people = r.people; S.meta = r.meta; S.since = r.meta.serverTime;
     S.lastSync = Date.now(); S.syncErr = ''; backoff = 0; clearTimeout(retryTimer);
     await persistNow();
     snapshotMaybe();
     updateBadge();
-    render();
+    // background syncs with no news leave the screen alone (no flicker, no lost scroll)
+    if (changed || parseRoute().view === 'settings') render();
     if (!quiet) toast('Synced');
   } catch (e) {
     S.syncErr = errText(e);
@@ -631,7 +635,7 @@ async function runOp(op) {
     const doc = S.docs[op.docId] ? Object.assign({}, S.docs[op.docId]) : op.doc;
     doc.Files = await uploadPending(doc.Files || [], op);
     const r = op.op === 'renew' ? await api('renewDoc', { oldId: op.oldId, doc: stripLocal(doc) }) : await api('saveDoc', { doc: stripLocal(doc) });
-    const saved = op.op === 'renew' ? r.doc : r.doc;
+    const saved = r.doc;
     S.docs[saved.ID] = saved;
     if (r.old) S.docs[r.old.ID] = r.old;
     (op.cleanup || []).forEach(k => DB.del(k, 'blobs').catch(() => {}));
@@ -657,7 +661,7 @@ async function uploadPending(files, op) {
     out.push(nf);
     // persist progress so a retry does not upload twice
     const live = S.docs[op.docId];
-    if (live) { live.Files = live.Files.map(x => x.pending === f.pending ? nf : x); persist(); }
+    if (live) { S.docs[op.docId] = Object.assign({}, live, { Files: live.Files.map(x => x.pending === f.pending ? nf : x) }); persist(); }
     (op.cleanup = op.cleanup || []).push(f.pending);
   }
   return out;
@@ -723,21 +727,25 @@ function snapshotMaybe() {
   }).catch(() => {});
 }
 /* ============================== 5. router / render ============================== */
-const catOf = name => S.cats.find(c => c.Name === name) || { Name: name || 'Uncategorised', Icon: '📁', Colour: '#9AA0A6', LeadDays: 30, Fields: '' };
-const personOf = name => S.people.find(p => p.Name === name) || { Name: name, Colour: '#9AA0A6' };
+// name → row lookups, rebuilt only when the cats / people arrays are replaced
+const byName = (() => { const memo = new WeakMap(); return list => { let m = memo.get(list); if (!m) { m = new Map(list.map(x => [x.Name, x])); memo.set(list, m); } return m; }; })();
+const catOf = name => byName(S.cats).get(name) || { Name: name || 'Uncategorised', Icon: '📁', Colour: '#9AA0A6', LeadDays: 30, Fields: '' };
+const personOf = name => byName(S.people).get(name) || { Name: name, Colour: '#9AA0A6' };
 const docList = () => Object.values(S.docs);
-const leadOf = d => d.RenewalLeadDays !== '' && d.RenewalLeadDays !== undefined && d.RenewalLeadDays !== null && !isNaN(d.RenewalLeadDays) ? Number(d.RenewalLeadDays) : Number(catOf(d.Category).LeadDays || 30);
-const statusOf = d => d.Status === 'Archived' ? 'Archived' : (daysLeft(d) !== null && daysLeft(d) < 0 ? 'Expired' : 'Active');
-const isLive = d => statusOf(d) !== 'Archived';
+const splitTags = t => String(t || '').split(',').map(x => x.trim()).filter(Boolean);
+const docHref = d => '#doc=' + encodeURIComponent(d.ID);
+const leadOf = d => d.RenewalLeadDays !== '' && d.RenewalLeadDays != null && !isNaN(d.RenewalLeadDays) ? Number(d.RenewalLeadDays) : Number(catOf(d.Category).LeadDays || 30);
+const statusOf = d => { if (d.Status === 'Archived') return 'Archived'; const n = daysLeft(d); return n !== null && n < 0 ? 'Expired' : 'Active'; };
+const isLive = d => d.Status !== 'Archived';
 function catIcon(name, sm) { const c = catOf(name); return `<span class="cicon${sm ? ' sm' : ''}" style="background:${esc(c.Colour)}22;color:${esc(c.Colour)}">${esc(c.Icon || '📁')}</span>`; }
 function expiryPill(d) {
-  const n = daysLeft(d); if (n === null) return statusOf(d) === 'Archived' ? '<span class="pill grey">Archived</span>' : '';
-  if (statusOf(d) === 'Archived') return '<span class="pill grey">Archived</span>';
+  if (d.Status === 'Archived') return '<span class="pill grey">Archived</span>';
+  const n = daysLeft(d); if (n === null) return '';
   return `<span class="pill ${expiryTone(n, leadOf(d))}">${esc(relDays(n))}</span>`;
 }
 function docItem(d) {
   const sub = [d.Owner, d.Category, d.ExpiryDate ? 'exp ' + fmtDate(d.ExpiryDate) : ''].filter(Boolean).map(esc).join(' · ');
-  return `<a class="item" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category)}
+  return `<a class="item" href="${docHref(d)}">${catIcon(d.Category)}
     <div class="grow"><div class="t ellipsis">${d.Pinned ? '★ ' : ''}${esc(d.Title)}${d.Encrypted ? ' 🔒' : ''}${d._local ? ' <span class="pill gold">pending</span>' : ''}</div><div class="s ellipsis">${sub}</div></div>${expiryPill(d)}</a>`;
 }
 function parseRoute() {
@@ -770,7 +778,7 @@ function render(opts = {}) {
   const views = { home: viewHome, browse: viewBrowse, add: viewAdd, expiring: viewExpiring, settings: viewSettings, doc: viewDoc, edit: viewAdd, renew: viewAdd };
   const fn = views[r.view] || viewHome;
   if (['home', 'browse', 'add', 'expiring', 'settings'].includes(r.view)) lastTab = r.view;
-  $$('#tabs a').forEach(a => a.classList.toggle('on', a.dataset.tab === lastTab));
+  $$('#tabs a').forEach(a => { const on = a.dataset.tab === lastTab; a.classList.toggle('on', on); on ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'); });
   // don't wipe a form the user is typing in when a background sync finishes
   if (!opts.force && keepScroll && ['add', 'edit', 'renew'].includes(r.view) && app.querySelector('#docForm')) { refreshFormBits(); return; }
   const slideCls = swipeDir ? (swipeDir > 0 ? ' from-r' : ' from-l') : ''; swipeDir = 0;
@@ -842,15 +850,26 @@ function updateBadge() {
   const b = $('#expBadge'); if (b) { b.textContent = n; b.classList.toggle('hidden', !n); }
   try { if (navigator.setAppBadge) n ? navigator.setAppBadge(n) : navigator.clearAppBadge(); } catch (e) {}
 }
+// search text per doc object; docs are replaced (not mutated) on save/sync, so a WeakMap stays correct
+const hayMemo = new WeakMap();
+function hayOf(d) {
+  let h = hayMemo.get(d);
+  if (!h) {
+    h = { all: [d.Title, d.Category, d.Owner, d.Issuer, d.Tags, d.Notes, Crypto.isEnc(d.DocNumber) ? '' : d.DocNumber, Object.values(d.Extra || {}).join(' '), d.ExpiryDate, (d.Files || []).map(f => f.origName || f.name).join(' ')].join(' ').toLowerCase(), title: String(d.Title || '').toLowerCase() };
+    hayMemo.set(d, h);
+  }
+  return h;
+}
 function searchDocs(q) {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
   if (!terms.length) return [];
-  return docList().map(d => {
-    const hay = [d.Title, d.Category, d.Owner, d.Issuer, d.Tags, d.Notes, Crypto.isEnc(d.DocNumber) ? '' : d.DocNumber, Object.values(d.Extra || {}).join(' '), d.ExpiryDate, (d.Files || []).map(f => f.origName || f.name).join(' ')].join(' ').toLowerCase();
-    if (!terms.every(t => hay.includes(t))) return null;
-    let score = terms.reduce((a, t) => a + (d.Title.toLowerCase().includes(t) ? 3 : 1), 0) + (isLive(d) ? 1 : 0);
-    return { d, score };
-  }).filter(Boolean).sort((a, b) => b.score - a.score).slice(0, 30).map(x => x.d);
+  const out = [];
+  for (const d of docList()) {
+    const h = hayOf(d);
+    if (!terms.every(t => h.all.includes(t))) continue;
+    out.push({ d, score: terms.reduce((a, t) => a + (h.title.includes(t) ? 3 : 1), 0) + (isLive(d) ? 1 : 0) });
+  }
+  return out.sort((a, b) => b.score - a.score).slice(0, 30).map(x => x.d);
 }
 function viewHome() {
   const docs = docList();
@@ -870,13 +889,13 @@ function viewHome() {
   <div class="cols"><div class="colL">
   ${docs.length ? `<div class="section"><button class="card health" id="healthBtn"><div class="ring" style="--v:${h.score}"><b>${h.score}</b></div><div class="grow"><h3>Vault health</h3><div class="small muted">${h.score >= 85 ? 'Looking solid.' : h.score >= 60 ? 'A few things to tidy up.' : 'Needs some attention.'} Tap for details.</div></div></button></div>` : ''}
   <div class="section"><div class="hd"><h2>★ Quick access</h2></div>
-    ${pinned.length ? `<div class="quick">${pinned.map(d => `<a class="qa" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category, 1)}<div class="t">${esc(d.Title)}</div>${expiryPill(d)}</a>`).join('')}</div>`
+    ${pinned.length ? `<div class="quick">${pinned.map(d => `<a class="qa" href="${docHref(d)}">${catIcon(d.Category, 1)}<div class="t">${esc(d.Title)}</div>${expiryPill(d)}</a>`).join('')}</div>`
       : `<div class="card small muted">Pin your most-used documents (IC, passport, licence) from the ⋯ menu and they show up here.</div>`}</div>
   ${missing.length ? `<div class="section"><div class="hd"><h2>Checklist</h2><span class="tiny muted">${h.checklist.filter(c => c.done).length}/${h.checklist.length}</span></div><div class="card" style="padding:4px 14px">
     ${missing.map(c => `<a class="check" href="#add?cat=${encodeURIComponent(c.cat)}&title=${encodeURIComponent(c.t)}"><span class="box"></span><span class="grow">Add your ${esc(c.t.replace(/^[A-Z](?=[a-z])/, m => m.toLowerCase()))}</span><span class="muted">+</span></a>`).join('')}</div></div>` : ''}
   </div><div class="colR">
   <div class="section"><div class="hd"><h2>Recent</h2></div>
-    ${recent.length ? `<div class="list">${recent.map(d => `<a class="item" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category, 1)}<div class="grow t ellipsis">${esc(d.Title)}</div><span class="small muted">${esc(ago(d.Updated))}</span></a>`).join('')}</div>`
+    ${recent.length ? `<div class="list">${recent.map(d => `<a class="item" href="${docHref(d)}">${catIcon(d.Category, 1)}<div class="grow t ellipsis">${esc(d.Title)}</div><span class="small muted">${esc(ago(d.Updated))}</span></a>`).join('')}</div>`
       : `<div class="card empty"><div class="big">🔐</div>Your vault is empty.<br><a class="btn primary" style="margin-top:14px" href="#add">Add your first document</a></div>`}</div>
   <div class="section"><div class="hd"><h2>Categories</h2></div><div class="cats">
     ${S.cats.map(c => `<a class="cat" href="#browse?cat=${encodeURIComponent(c.Name)}">${catIcon(c.Name, 1)}<div class="n">${esc(c.Name)}</div><div class="c">${counts[c.Name] || 0} doc${counts[c.Name] === 1 ? '' : 's'}</div></a>`).join('')}
@@ -907,11 +926,11 @@ function viewBrowse(r) {
   const b = S.ui.browse;
   if (r.params.cat !== undefined) { b.cat = r.params.cat; history.replaceState(null, '', '#browse'); }
   const all = docList();
-  const tags = [...new Set(all.flatMap(d => String(d.Tags || '').split(',').map(t => t.trim()).filter(Boolean)))].sort();
+  const tags = [...new Set(all.flatMap(d => splitTags(d.Tags)))].sort();
   const years = [...new Set(all.map(d => (d.IssueDate || d.Created || '').slice(0, 4)).filter(Boolean))].sort().reverse();
   let docs = all.filter(d => (!b.cat || d.Category === b.cat) && (!b.owner || d.Owner === b.owner) &&
     (!b.status || (b.status === 'live' ? isLive(d) : statusOf(d) === b.status)) &&
-    (!b.tag || String(d.Tags).split(',').map(t => t.trim()).includes(b.tag)) &&
+    (!b.tag || splitTags(d.Tags).includes(b.tag)) &&
     (!b.year || (d.IssueDate || d.Created || '').startsWith(b.year)));
   const sorts = {
     expiry: (x, y) => (x.ExpiryDate || '9999').localeCompare(y.ExpiryDate || '9999') || x.Title.localeCompare(y.Title),
@@ -932,7 +951,7 @@ function viewBrowse(r) {
   <div class="row" style="margin:12px 0 10px"><span class="small muted grow">${docs.length} document${docs.length === 1 ? '' : 's'}</span>
     <select class="in" id="fSort" style="width:auto;height:38px"><option value="expiry" ${b.sort === 'expiry' ? 'selected' : ''}>Sort: expiry</option><option value="title" ${b.sort === 'title' ? 'selected' : ''}>Sort: title</option><option value="updated" ${b.sort === 'updated' ? 'selected' : ''}>Sort: updated</option></select></div>
   ${!docs.length ? `<div class="card empty"><div class="big">🗂️</div>Nothing here yet.<br><a class="btn primary" style="margin-top:14px" href="#add${b.cat ? '?cat=' + encodeURIComponent(b.cat) : ''}">Add a document</a></div>`
-    : b.view === 'grid' ? `<div class="gridv">${docs.map(d => `<a class="gcard" href="#doc=${encodeURIComponent(d.ID)}">${catIcon(d.Category)}<div class="t">${d.Pinned ? '★ ' : ''}${esc(d.Title)}${d.Encrypted ? ' 🔒' : ''}</div><div class="small muted ellipsis">${esc(d.Owner || '')}</div><div style="margin-top:auto">${expiryPill(d) || `<span class="tiny dim">${esc(ago(d.Updated))}</span>`}</div></a>`).join('')}</div>`
+    : b.view === 'grid' ? `<div class="gridv">${docs.map(d => `<a class="gcard" href="${docHref(d)}">${catIcon(d.Category)}<div class="t">${d.Pinned ? '★ ' : ''}${esc(d.Title)}${d.Encrypted ? ' 🔒' : ''}</div><div class="small muted ellipsis">${esc(d.Owner || '')}</div><div style="margin-top:auto">${expiryPill(d) || `<span class="tiny dim">${esc(ago(d.Updated))}</span>`}</div></a>`).join('')}</div>`
     : `<div class="list">${docs.map(docItem).join('')}</div>`}`;
 }
 afterRender.browse = () => {
@@ -955,7 +974,7 @@ function viewDoc(r) {
   const files = d.Files || [];
   let validity = '';
   if (d.ExpiryDate) {
-    const iss = parseYMD(d.IssueDate), exp = parseYMD(d.ExpiryDate), now = parseYMD(todayStr());
+    const iss = parseYMD(d.IssueDate), exp = parseYMD(d.ExpiryDate), now = todayDate();
     const pct = iss && exp > iss ? Math.max(0, Math.min(100, 100 * daysBetween(now, exp) / daysBetween(iss, exp))) : null;
     const tone = expiryTone(n, lead);
     validity = `<dt>Expires</dt><dd><b>${esc(fmtDate(d.ExpiryDate))}</b> <span class="pill ${tone}">${esc(relDays(n))}</span>
@@ -988,7 +1007,7 @@ function viewDoc(r) {
     ${d.IssueDate ? `<dt>Issued</dt><dd>${esc(fmtDate(d.IssueDate))}</dd>` : ''}
     ${validity}
     ${extra.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}
-    ${d.Tags ? `<dt>Tags</dt><dd class="row wrap" style="gap:6px">${String(d.Tags).split(',').map(t => t.trim()).filter(Boolean).map(t => `<a class="chip" href="#browse" data-tag="${esc(t)}">#${esc(t)}</a>`).join('')}</dd>` : ''}
+    ${d.Tags ? `<dt>Tags</dt><dd class="row wrap" style="gap:6px">${splitTags(d.Tags).map(t => `<a class="chip" href="#browse" data-tag="${esc(t)}">#${esc(t)}</a>`).join('')}</dd>` : ''}
     ${d.LinkedApp ? `<dt>Linked</dt><dd>${linkPage ? `<a href="${esc(linkPage)}#${d.LinkedApp === 'garage' ? 'car' : d.LinkedApp === 'ledger' ? 'txn' : 'task'}=${encodeURIComponent(d.LinkedID)}" target="_blank" rel="noopener">${esc(linkLabel[d.LinkedApp] || d.LinkedApp)} ↗</a>` : esc(linkLabel[d.LinkedApp] || d.LinkedApp)} <span class="tiny dim">${esc(d.LinkedID)}</span></dd>` : ''}
     ${d.Notes ? `<dt>Notes</dt><dd style="white-space:pre-wrap">${esc(d.Notes)}</dd>` : ''}
     <dt>Status</dt><dd>${esc(statusOf(d))}${d.Encrypted ? ' · 🔒 encrypted files' : ''}</dd>
@@ -1087,19 +1106,13 @@ function watchPasswordFields() {
 /* ---- Settings → View app key (PIN / Face ID first) ---- */
 async function confirmIdentity() {
   const c = Lock.cfg() || {};
-  if (c.bio) {
-    try {
-      await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ type: 'public-key', id: bufFromB64(c.bio) }], userVerification: 'required', timeout: 60000 } });
-      return true;
-    } catch (e) { /* fall back to the PIN */ }
-  }
+  if (c.bio && await Lock.bioCheck()) return true; // else fall back to the PIN
   if (!c.hash) return true;
   if (c.until && Date.now() < c.until) { toast('Too many wrong PINs — try again later', { error: true }); return false; }
   const pin = await askText('Confirm it’s you', { label: 'PIN', type: 'password', inputmode: 'numeric', ok: 'Continue', note: 'Enter your 6-digit Vault PIN to view the app key.' });
   if (pin === null) return false;
   if (await Lock.hashPin(pin.trim(), c.salt) === c.hash) { Lock.save({ fails: 0, until: 0 }); return true; }
-  const fails = (c.fails || 0) + 1;
-  Lock.save({ fails, until: fails >= 5 ? Date.now() + Math.min(900, 30 * 2 ** (fails - 5)) * 1000 : 0 });
+  Lock.fail();
   toast('Wrong PIN', { error: true }); return false;
 }
 async function viewAppKey() {
@@ -1212,7 +1225,7 @@ function saveLocal(d, extra = {}) {
 function viewExpiring() {
   const docs = docList().filter(d => isLive(d) && d.ExpiryDate).map(d => ({ d, n: daysLeft(d) })).sort((a, b) => a.n - b.n);
   const noExp = docList().filter(d => isLive(d) && !d.ExpiryDate).length;
-  const row = ({ d, n }) => `<div class="item">${catIcon(d.Category)}<a class="grow" href="#doc=${encodeURIComponent(d.ID)}" style="color:inherit;min-width:0"><div class="t ellipsis">${esc(d.Title)}</div><div class="s ellipsis">${esc(fmtDate(d.ExpiryDate))} · ${esc(relDays(n))}${d.Owner ? ' · ' + esc(d.Owner) : ''}</div></a><a class="btn sm ${n <= leadOf(d) ? 'primary' : ''}" href="#renew=${encodeURIComponent(d.ID)}">Renew</a></div>`;
+  const row = ({ d, n }) => `<div class="item">${catIcon(d.Category)}<a class="grow" href="${docHref(d)}" style="color:inherit;min-width:0"><div class="t ellipsis">${esc(d.Title)}</div><div class="s ellipsis">${esc(fmtDate(d.ExpiryDate))} · ${esc(relDays(n))}${d.Owner ? ' · ' + esc(d.Owner) : ''}</div></a><a class="btn sm ${n <= leadOf(d) ? 'primary' : ''}" href="#renew=${encodeURIComponent(d.ID)}">Renew</a></div>`;
   const grp = (title, tone, items, note) => items.length ? `<div class="section"><div class="hd"><h2><span class="pill ${tone}">${items.length}</span> ${title}</h2>${note ? `<span class="tiny muted">${note}</span>` : ''}</div><div class="list">${items.map(row).join('')}</div></div>` : '';
   const overdue = docs.filter(x => x.n < 0), d30 = docs.filter(x => x.n >= 0 && x.n <= 30), d180 = docs.filter(x => x.n > 30 && x.n <= 180), later = docs.filter(x => x.n > 180);
   const months = {}; docs.filter(x => x.n >= 0).forEach(x => { const k = x.d.ExpiryDate.slice(0, 7); (months[k] = months[k] || []).push(x); });
@@ -1223,7 +1236,7 @@ function viewExpiring() {
   ${grp('31 – 180 days', 'green', d180)}
   ${grp('Later', 'grey', later)}
   ${Object.keys(months).length ? `<div class="section"><div class="hd"><h2>Timeline</h2></div><div class="timeline">${Object.keys(months).sort().map(k => {
-    const [y, m] = k.split('-'); return `<div class="tm"><h3>${MONTHS[+m - 1]} ${y}</h3>${months[k].map(({ d, n }) => `<a class="row small" href="#doc=${encodeURIComponent(d.ID)}" style="color:inherit;padding:3px 0"><span>${esc(catOf(d.Category).Icon)}</span><span class="grow ellipsis">${esc(d.Title)}</span><span class="pill ${expiryTone(n, leadOf(d))}">${+d.ExpiryDate.slice(8)} ${MONTHS[+m - 1]}</span></a>`).join('')}</div>`;
+    const [y, m] = k.split('-'); return `<div class="tm"><h3>${MONTHS[+m - 1]} ${y}</h3>${months[k].map(({ d, n }) => `<a class="row small" href="${docHref(d)}" style="color:inherit;padding:3px 0"><span>${esc(catOf(d.Category).Icon)}</span><span class="grow ellipsis">${esc(d.Title)}</span><span class="pill ${expiryTone(n, leadOf(d))}">${+d.ExpiryDate.slice(8)} ${MONTHS[+m - 1]}</span></a>`).join('')}</div>`;
   }).join('')}</div></div>` : ''}
   ${noExp ? `<p class="small muted" style="margin-top:18px">${noExp} active document${noExp === 1 ? ' has' : 's have'} no expiry date. <a href="#browse">Browse</a></p>` : ''}
   <p class="tiny dim" style="margin-top:10px">Reminders are created in your Google Calendar “Vault” on expiry − lead days and on the expiry date.</p>`;
@@ -1254,7 +1267,7 @@ function initForm(r) {
     if (r.view === 'edit') { f.files = (src.Files || []).map(x => ({ file: x })); f.encrypt = !!src.Encrypted; }
     else {
       f.oldId = src.ID; f.doc.ID = uid('d'); f.doc.Files = []; f.doc.IssueDate = ''; f.doc.ExpiryDate = ''; f.doc.PrevID = src.ID; f.doc.Status = 'Active';
-      f.doc.Tags = String(f.doc.Tags || '').split(',').map(t => t.trim()).filter(t => t && t !== 'previous-version').join(', ');
+      f.doc.Tags = splitTags(f.doc.Tags).filter(t => t !== 'previous-version').join(', ');
       f.encrypt = !!src.Encrypted;
     }
   }
@@ -1372,7 +1385,7 @@ afterRender.add = afterRender.edit = afterRender.renew = () => {
   $$('[data-y]').forEach(b => b.onclick = () => {
     const iss = parseYMD(f.doc.IssueDate); if (!iss) return;
     const e = new Date(iss.getFullYear() + Number(b.dataset.y), iss.getMonth(), iss.getDate() - 1);
-    f.doc.ExpiryDate = e.getFullYear() + '-' + String(e.getMonth() + 1).padStart(2, '0') + '-' + String(e.getDate()).padStart(2, '0');
+    f.doc.ExpiryDate = ymd(e);
     form.ExpiryDate.value = f.doc.ExpiryDate;
   });
   $('#srcScan').onclick = () => openScanner();
@@ -1838,7 +1851,23 @@ const Lock = {
   cfg() { return LS.get('lock', null); },
   save(p) { LS.set('lock', Object.assign({}, this.cfg() || {}, p)); },
   last: Date.now(), hiddenAt: 0, buf: '',
+  idleMs() { return ((this.cfg() || {}).idle || 5) * 60000; },
+  hasPin() { return !!(this.cfg() || {}).hash; },
   async hashPin(pin, salt) { const bits = await Crypto.pbkdf2Bits('vault-pin:' + pin, bufFromB64(salt), 150000); return b64FromBuf(bits); },
+  /** Count a wrong PIN; from the 5th one, pause 30 s doubling up to 15 min. */
+  fail() {
+    const fails = ((this.cfg() || {}).fails || 0) + 1;
+    const until = fails >= 5 ? Date.now() + Math.min(900, 30 * 2 ** (fails - 5)) * 1000 : 0;
+    this.save({ fails, until }); return { fails, until };
+  },
+  /** One platform-biometric check. Resolves true / false, never throws. */
+  async bioCheck() {
+    const c = this.cfg() || {}; if (!c.bio) return false;
+    try {
+      await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ type: 'public-key', id: bufFromB64(c.bio) }], userVerification: 'required', timeout: 60000 } });
+      return true;
+    } catch (e) { return false; }
+  },
   lock() {
     S.encKey = null; for (const k in plainNums) delete plainNums[k]; S.files.clear(); closeViewer();
     $$('.scrim').forEach(x => x.remove());
@@ -1883,9 +1912,7 @@ const Lock = {
     if (mode === 'unlock' || mode === 'old') {
       if (c.until && Date.now() < c.until) return this.shake(`Too many tries — wait ${Math.ceil((c.until - Date.now()) / 1000)} s`);
       if (await this.hashPin(pin, c.salt) === c.hash) { if (mode === 'old') return this.show('set', { cancel: true }); return this.unlocked(); }
-      const fails = (c.fails || 0) + 1;
-      const until = fails >= 5 ? Date.now() + Math.min(900, 30 * 2 ** (fails - 5)) * 1000 : 0;
-      this.save({ fails, until });
+      const { fails, until } = this.fail();
       return this.shake(fails >= 5 ? `Wrong PIN. Locked for ${Math.round((until - Date.now()) / 1000)} s` : `Wrong PIN (${5 - fails} left before a pause)`);
     }
     if (mode === 'set') return this.show('confirm', { first: pin, cancel: ctx.cancel });
@@ -1921,23 +1948,20 @@ const Lock = {
     } catch (e) { toast('Biometric setup cancelled', { error: true }); return false; }
   },
   async bio(auto) {
-    const c = this.cfg() || {}; if (!c.bio) return;
-    try {
-      await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ type: 'public-key', id: bufFromB64(c.bio) }], userVerification: 'required', timeout: 60000 } });
-      this.unlocked();
-    } catch (e) { if (!auto) toast('Biometric check failed — use your PIN', { error: true }); }
+    if (!(this.cfg() || {}).bio) return;
+    if (await this.bioCheck()) this.unlocked();
+    else if (!auto) toast('Biometric check failed — use your PIN', { error: true });
   },
   watch() {
+    const isLocked = () => document.body.classList.contains('locked');
     ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(ev => addEventListener(ev, () => { this.last = Date.now(); }, { passive: true, capture: true }));
-    setInterval(() => { if (!document.body.classList.contains('locked') && (this.cfg() || {}).hash && Date.now() - this.last > ((this.cfg() || {}).idle || 5) * 60000) this.lock(); }, 10000);
+    setInterval(() => { if (!isLocked() && this.hasPin() && Date.now() - this.last > this.idleMs()) this.lock(); }, 10000);
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') { this.hiddenAt = Date.now(); document.body.classList.add('privacy'); }
-      else {
-        document.body.classList.remove('privacy');
-        const idle = ((this.cfg() || {}).idle || 5) * 60000;
-        if (!document.body.classList.contains('locked') && (this.cfg() || {}).hash && this.hiddenAt && Date.now() - this.hiddenAt > idle) this.lock();
-        else if (!document.body.classList.contains('locked') && Date.now() - S.lastSync > 60000) sync();
-      }
+      if (document.visibilityState === 'hidden') { this.hiddenAt = Date.now(); document.body.classList.add('privacy'); return; }
+      document.body.classList.remove('privacy');
+      if (isLocked()) return;
+      if (this.hasPin() && this.hiddenAt && Date.now() - this.hiddenAt > this.idleMs()) this.lock();
+      else if (Date.now() - S.lastSync > 60000) sync();
     });
   },
 };
@@ -1954,10 +1978,11 @@ function normItem(it) {
     mime: String(pick('mime', 'mimeType', 'Mime')), date: String(pick('date', 'Date')).slice(0, 10),
   };
 }
+const listRows = r => r.items || r.data || r.rows || r.cars || r.transactions || r.tasks || [];
 async function linkedList(app) {
   const l = (S.meta.links || {})[app]; if (!l || !l.url) throw new Error('Set up ' + app + ' in Settings › Linked apps');
   const r = await api('list', {}, { url: l.url, key: l.key, timeout: 60000 });
-  return (r.items || r.data || r.rows || r.cars || r.transactions || r.tasks || []).map(normItem).filter(x => x.id);
+  return listRows(r).map(normItem).filter(x => x.id);
 }
 async function pickLinked(app, cb) {
   const s = sheet(`<h2>Pick from ${esc(app)}</h2><input class="in" id="lkQ" placeholder="Filter" style="margin-top:8px"><div id="lkL" class="small muted" style="margin-top:10px">Loading…</div><button class="btn block" style="margin-top:14px" data-close>Close</button>`, { focus: false });
@@ -1979,7 +2004,7 @@ function editLink(app) {
     <div class="btns" style="margin-top:14px"><button class="btn" id="lTest">Test</button><button class="btn primary" id="lSave">Save</button></div>
     <p class="tiny dim" style="margin-top:12px">To let ${name} read Vault, give it this bridge URL and Vault's <b>link key</b> (printed by setup(); rotate with rotateLinkKey()).</p>`);
   const val = () => ({ url: $('#lU', s.el).value.trim(), key: $('#lK', s.el).value.trim(), page: $('#lP', s.el).value.trim(), tasks: !!($('#lT', s.el) || {}).checked });
-  $('#lTest', s.el).onclick = async () => { try { const r = await api('list', {}, { url: val().url, key: val().key, timeout: 45000 }); const n = (r.items || r.data || r.rows || r.cars || r.transactions || r.tasks || []).length; toast(`${name} answered: ${n} items`); } catch (e) { toast(name + ': ' + errText(e), { error: true }); } };
+  $('#lTest', s.el).onclick = async () => { try { const r = await api('list', {}, { url: val().url, key: val().key, timeout: 45000 }); const n = listRows(r).length; toast(`${name} answered: ${n} items`); } catch (e) { toast(name + ': ' + errText(e), { error: true }); } };
   $('#lSave', s.el).onclick = async () => {
     const links = Object.assign({}, S.meta.links || {}, { [app]: val() });
     try { const r = await api('setLinks', { links }); S.meta = r.meta; persist(); s.close(); toast(name + ' saved'); render(); } catch (e) { toast(errText(e), { error: true }); }
@@ -2011,7 +2036,7 @@ async function createFlowTask(doc) {
   const l = (S.meta.links || {}).flow; if (!l || !l.url || !l.tasks) return;
   const exp = parseYMD(doc.ExpiryDate); if (!exp) return;
   const due = new Date(exp); due.setDate(due.getDate() - leadOf(doc));
-  const dueStr = due.getFullYear() + '-' + String(due.getMonth() + 1).padStart(2, '0') + '-' + String(due.getDate()).padStart(2, '0');
+  const dueStr = ymd(due);
   const link = location.origin + location.pathname + '#doc=' + doc.ID;
   try {
     await api(FLOW_ADD_ACTION, { task: { title: '🔐 Renew: ' + doc.Title, text: '🔐 Renew: ' + doc.Title + ' #personal !high', tags: ['personal'], priority: 'high', due: dueStr, notes: 'Expires ' + doc.ExpiryDate + '\n' + link, source: 'vault', sourceId: doc.ID } }, { url: l.url, key: l.key, timeout: 45000 });
