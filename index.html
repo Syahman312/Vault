@@ -176,6 +176,19 @@ input[type=date].in::-webkit-date-and-time-value{text-align:left}
 .dots{display:flex;justify-content:center;gap:6px;margin-top:8px}
 .dots i{width:6px;height:6px;border-radius:50%;background:var(--line2)}
 .dots i.on{background:var(--accent)}
+.carwrap{position:relative}
+.navarrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:opacity .15s}
+.navarrow svg{width:22px;height:22px}
+.navarrow.l{left:8px}.navarrow.r{right:8px}
+.navarrow[hidden]{display:grid;opacity:0;pointer-events:none}
+.carcount{position:absolute;right:10px;top:10px;z-index:3;font-size:12px;font-weight:600;background:rgba(0,0,0,.62);color:#fff;padding:3px 9px;border-radius:99px;pointer-events:none}
+.dots i{cursor:pointer;padding:0;border:0}
+.dots button{width:22px;height:22px;display:grid;place-items:center;background:none;border:0;padding:0}
+#viewer .navarrow{width:48px;height:48px}
+#viewer .navarrow.l{left:10px}#viewer .navarrow.r{right:10px}
+#viewer .vcount{font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
+#viewer .vb img.slidein-r{animation:fromR .2s ease}#viewer .vb img.slidein-l{animation:fromL .2s ease}
+@media (hover:hover) and (pointer:fine){.navarrow:hover{background:rgba(0,0,0,.8);border-color:var(--accent)}}
 .kv{display:grid;grid-template-columns:110px 1fr;gap:10px 12px;align-items:start}
 .kv dt{color:var(--muted);font-size:13px;padding-top:1px}
 .kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
@@ -354,7 +367,7 @@ body.dragging .drop{display:block;border-color:var(--accent);color:var(--accent)
    7 browse · 8 document · 9 expiring · 10 add/edit/renew · 11 scan/pdf
    12 viewer · 13 settings · 14 lock · 15 linked apps · 16 boot
    ========================================================================== */
-const APP_VERSION = '1.3.1';
+const APP_VERSION = '1.4.0';
 
 /* ============================== 1. utils ============================== */
 const $ = (s, r = document) => r.querySelector(s);
@@ -756,6 +769,8 @@ function parseRoute() {
   return m ? { view: m[1], id: m[2], params } : { view: path || 'home', params };
 }
 const icons = {
+  prev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
   back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
   more: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
   search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
@@ -990,9 +1005,9 @@ function viewDoc(r) {
   return `${topBar(esc(d.Title), { back: true, extra: `<button class="iconbtn" id="docMenu" aria-label="More">${icons.more}</button>` })}
   ${newer ? `<a class="banner" href="#doc=${encodeURIComponent(newer.ID)}" style="margin:0 0 12px"><span>🗂️</span><div class="grow small">This is a previous version. <b>Open the current one</b></div><span class="muted">›</span></a>` : ''}
   <div class="docgrid"><div class="docL">
-  ${files.length ? `<div class="carousel" id="car">${files.map((f, i) => `<button class="slide" data-i="${i}"><span class="tag">${i + 1}/${files.length}${f.ref ? ' · ref' : ''}${f.enc ? ' · 🔒' : ''}</span>
+  ${files.length ? `<div class="carwrap">${files.length > 1 ? `<button class="navarrow l" id="carPrev" aria-label="Previous file" hidden>${icons.prev}</button><button class="navarrow r" id="carNext" aria-label="Next file">${icons.next}</button><span class="carcount" id="carCount">1 / ${files.length}</span>` : ''}<div class="carousel" id="car">${files.map((f, i) => `<button class="slide" data-i="${i}">${f.ref || f.enc ? `<span class="tag">${[f.ref ? 'read-only' : '', f.enc ? '🔒' : ''].filter(Boolean).join(' · ')}</span>` : ''}
       <div class="ph"><div class="big">${mimeIcon(f.origMime || f.mime, f.origName || f.name)}</div><div class="small ellipsis" style="max-width:240px">${esc(f.origName || f.name)}</div><div class="tiny dim">${fmtSize(f.size)}${f.pending ? ' · waiting to upload' : ''} · tap to view</div></div></button>`).join('')}</div>
-      ${files.length > 1 ? `<div class="dots" id="dots">${files.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}`
+      </div>${files.length > 1 ? `<div class="dots" id="dots">${files.map((_, i) => `<button type="button" data-dot="${i}" aria-label="File ${i + 1}"><i class="${i ? '' : 'on'}"></i></button>`).join('')}</div>` : ''}`
     : `<div class="card empty" style="padding:24px"><div class="big">📭</div>No file attached. <a href="#edit=${encodeURIComponent(d.ID)}">Add one</a></div>`}
   </div><div class="docR">
   <div class="card doccard"><dl class="kv" style="margin:0">
@@ -1025,11 +1040,24 @@ function viewDoc(r) {
 afterRender.doc = r => {
   const d = S.docs[r.id]; if (!d) return;
   const files = d.Files || [];
-  $$('.slide').forEach(el => el.onclick = () => openViewer(files[+el.dataset.i], d));
+  $$('.slide').forEach(el => el.onclick = () => openViewer(d, +el.dataset.i));
   const car = $('#car');
-  if (car && $('#dots')) car.addEventListener('scroll', debounce(() => {
-    const i = Math.round(car.scrollLeft / car.clientWidth); $$('#dots i').forEach((x, j) => x.classList.toggle('on', i === j));
-  }, 40), { passive: true });
+  if (car && files.length > 1) {
+    const step = () => { const sl = $('.slide', car); return sl ? sl.getBoundingClientRect().width + 10 : car.clientWidth; };
+    const cur = () => Math.max(0, Math.min(files.length - 1, Math.round(car.scrollLeft / step())));
+    const go = i => car.scrollTo({ left: Math.max(0, Math.min(files.length - 1, i)) * step(), behavior: 'smooth' });
+    const sync = () => {
+      const i = cur();
+      $$('#dots i').forEach((x, j) => x.classList.toggle('on', i === j));
+      $('#carPrev').hidden = i === 0; $('#carNext').hidden = i === files.length - 1;
+      $('#carCount').textContent = `${i + 1} / ${files.length}`;
+    };
+    car.addEventListener('scroll', debounce(sync, 40), { passive: true });
+    $('#carPrev').onclick = e => { e.stopPropagation(); go(cur() - 1); };
+    $('#carNext').onclick = e => { e.stopPropagation(); go(cur() + 1); };
+    $$('[data-dot]').forEach(b => b.onclick = () => go(+b.dataset.dot));
+    car.goTo = i => { car.scrollTo({ left: i * step() }); sync(); }; // used when the viewer closes
+  }
   // load previews (images inline, PDFs inline on wide screens)
   const gen = renderGen;
   (async () => {
@@ -1043,7 +1071,7 @@ afterRender.doc = r => {
         if (gen !== renderGen) return; // a newer render owns the DOM now
         const slide = $(`.slide[data-i="${i}"]`); if (!slide) return;
         const url = objUrl(got.blob);
-        const tag = $('.tag', slide).outerHTML;
+        const tagEl = $('.tag', slide); const tag = tagEl ? tagEl.outerHTML : '';
         slide.innerHTML = tag + (isImg ? `<img src="${url}" alt="${esc(f.origName || f.name)}">` : `<iframe src="${url}#toolbar=0" title="PDF preview"></iframe>`);
       } catch (e) { /* placeholder stays */ }
     }
@@ -1579,35 +1607,72 @@ function openScanner() {
 }
 /* ============================== 12. viewer ============================== */
 let viewerUrl = null;
-function closeViewer() { const v = $('#viewer'); if (v) v.remove(); if (viewerUrl) { URL.revokeObjectURL(viewerUrl); viewerUrl = null; } }
-async function openViewer(f, d) {
-  closeViewer();
-  const v = document.createElement('div'); v.id = 'viewer';
-  v.innerHTML = `<div class="vt"><button class="iconbtn" id="vClose" aria-label="Close">${icons.close}</button><div class="grow small ellipsis">${esc(f.origName || f.name)}</div>
-    <button class="btn sm" id="vOpen" disabled>Open</button><button class="btn sm" id="vSave" disabled>Save</button></div>
-    <div class="vb" id="vBody"><div class="muted">Loading…</div></div>`;
-  document.body.appendChild(v);
-  $('#vClose').onclick = closeViewer;
-  try {
-    const got = await getFile(f);
-    if (!v.isConnected) return;
-    const mime = f.origMime || got.mime || f.mime || '';
-    viewerUrl = URL.createObjectURL(got.blob.type ? got.blob : new Blob([got.blob], { type: mime }));
-    const body = $('#vBody');
-    if (/^image\//.test(mime)) { body.innerHTML = `<img id="vImg" src="${viewerUrl}" alt="">`; pinchZoom(body, $('#vImg')); }
-    else if (/pdf/.test(mime)) { body.classList.add('pdf'); body.innerHTML = `<iframe src="${viewerUrl}" title="PDF"></iframe>`; }
-    else body.innerHTML = `<div class="ph muted" style="text-align:center">No in-app preview for this file type.<br>Use Open or Save.</div>`;
-    $('#vOpen').disabled = $('#vSave').disabled = false;
-    $('#vOpen').onclick = () => window.open(viewerUrl, '_blank', 'noopener');
-    $('#vSave').onclick = () => download(f.origName || f.name, got.blob);
-  } catch (e) { $('#vBody').innerHTML = `<div class="muted" style="padding:20px;text-align:center">${esc(errText(e))}</div>`; }
+let viewerKeys = null;
+function closeViewer() {
+  const v = $('#viewer'); if (v) v.remove();
+  if (viewerUrl) { URL.revokeObjectURL(viewerUrl); viewerUrl = null; }
+  if (viewerKeys) { removeEventListener('keydown', viewerKeys); viewerKeys = null; }
 }
-function pinchZoom(area, img) {
-  let s = 1, x = 0, y = 0; const pts = new Map(); let start = null, lastTap = 0;
+/** Full-screen viewer for document d, starting at file index i. Arrows / swipe / ← → move between files. */
+async function openViewer(d, i = 0) {
+  closeViewer();
+  const files = d.Files || []; if (!files.length) return;
+  const multi = files.length > 1;
+  const v = document.createElement('div'); v.id = 'viewer';
+  v.innerHTML = `<div class="vt"><button class="iconbtn" id="vClose" aria-label="Close">${icons.close}</button><div class="grow small ellipsis" id="vName"></div>
+    ${multi ? '<span class="vcount" id="vCount"></span>' : ''}
+    <button class="btn sm" id="vOpen" disabled>Open</button><button class="btn sm" id="vSave" disabled>Save</button></div>
+    <div class="vb" id="vBody"></div>
+    ${multi ? `<button class="navarrow l" id="vPrev" aria-label="Previous file">${icons.prev}</button><button class="navarrow r" id="vNext" aria-label="Next file">${icons.next}</button>` : ''}`;
+  document.body.appendChild(v);
+  let idx = i, token = 0;
+  const close = () => { closeViewer(); const car = $('#car'); if (car && car.goTo) car.goTo(idx); };
+  $('#vClose').onclick = close;
+  const show = async (n, dir = 0) => {
+    idx = (n + files.length) % files.length;
+    const f = files[idx], my = ++token;
+    $('#vName').textContent = f.origName || f.name;
+    if (multi) {
+      $('#vCount').textContent = `${idx + 1} / ${files.length}`;
+      $('#vPrev').hidden = idx === 0; $('#vNext').hidden = idx === files.length - 1;
+    }
+    $('#vOpen').disabled = $('#vSave').disabled = true;
+    // fresh body each time so old pinch/swipe listeners go away
+    const old = $('#vBody'); const body = document.createElement('div'); body.className = 'vb'; body.id = 'vBody';
+    body.innerHTML = '<div class="muted">Loading…</div>'; old.replaceWith(body);
+    if (viewerUrl) { URL.revokeObjectURL(viewerUrl); viewerUrl = null; }
+    try {
+      const got = await getFile(f);
+      if (!v.isConnected || my !== token) return;
+      const mime = f.origMime || got.mime || f.mime || '';
+      viewerUrl = URL.createObjectURL(got.blob.type ? got.blob : new Blob([got.blob], { type: mime }));
+      if (/^image\//.test(mime)) {
+        body.innerHTML = `<img id="vImg" src="${viewerUrl}" alt="" class="${dir > 0 ? 'slidein-r' : dir < 0 ? 'slidein-l' : ''}">`;
+        pinchZoom(body, $('#vImg'), multi ? sdir => go(sdir) : null);
+      } else if (/pdf/.test(mime)) { body.classList.add('pdf'); body.innerHTML = `<iframe src="${viewerUrl}" title="PDF"></iframe>`; }
+      else body.innerHTML = `<div class="ph muted" style="text-align:center">No in-app preview for this file type.<br>Use Open or Save.</div>`;
+      const url = viewerUrl;
+      $('#vOpen').disabled = $('#vSave').disabled = false;
+      $('#vOpen').onclick = () => window.open(url, '_blank', 'noopener');
+      $('#vSave').onclick = () => download(f.origName || f.name, got.blob);
+    } catch (e) { if (my === token) body.innerHTML = `<div class="muted" style="padding:20px;text-align:center">${esc(errText(e))}</div>`; }
+  };
+  const go = dir => { const n = idx + dir; if (n < 0 || n >= files.length) return; show(n, dir); };
+  if (multi) { $('#vPrev').onclick = () => go(-1); $('#vNext').onclick = () => go(1); }
+  viewerKeys = e => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+  };
+  addEventListener('keydown', viewerKeys);
+  show(idx);
+}
+function pinchZoom(area, img, onSwipe) {
+  let s = 1, x = 0, y = 0; const pts = new Map(); let start = null, lastTap = 0, down = null;
   const apply = () => { img.style.transform = `translate(${x}px,${y}px) scale(${s})`; };
   const snapshot = () => { const p = [...pts.values()]; return { s, x, y, p: p.map(q => ({ ...q })), d: p.length > 1 ? Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) : 0 }; };
   area.addEventListener('pointerdown', e => {
     area.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); start = snapshot();
+    down = pts.size === 1 ? { x: e.clientX, y: e.clientY, t: Date.now(), s } : null;
     if (pts.size === 1) { const now = Date.now(); if (now - lastTap < 300) { s = s > 1 ? 1 : 2.5; if (s === 1) { x = y = 0; } apply(); } lastTap = now; }
   });
   area.addEventListener('pointermove', e => {
@@ -1617,7 +1682,14 @@ function pinchZoom(area, img) {
     else if (p.length === 1 && start.p[0] && s > 1) { x = start.x + p[0].x - start.p[0].x; y = start.y + p[0].y - start.p[0].y; }
     apply();
   });
-  const end = e => { pts.delete(e.pointerId); start = snapshot(); if (s === 1) { x = y = 0; apply(); } };
+  const end = e => {
+    if (onSwipe && down && down.s === 1 && s === 1 && pts.size === 1) {
+      const dx = e.clientX - down.x, dy = e.clientY - down.y;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && Date.now() - down.t < 700) onSwipe(dx < 0 ? 1 : -1);
+    }
+    if (pts.size <= 1) down = null;
+    pts.delete(e.pointerId); start = snapshot(); if (s === 1) { x = y = 0; apply(); }
+  };
   area.addEventListener('pointerup', end); area.addEventListener('pointercancel', end);
   area.addEventListener('wheel', e => { e.preventDefault(); s = Math.max(1, Math.min(6, s * (e.deltaY < 0 ? 1.15 : 0.87))); if (s === 1) x = y = 0; apply(); }, { passive: false });
 }
