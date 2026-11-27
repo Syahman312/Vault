@@ -13,7 +13,7 @@
  * Link key:   run `rotateLinkKey` (read-only key for Garage / Ledger / Flow).
  */
 
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 
 const CFG = {
   SHEET_NAME: 'Vault Data',
@@ -257,7 +257,13 @@ function installTriggers_() {
 
 /* ============================== Sheet helpers ============================== */
 
+let SS_ = null; // the Sheet, opened once per request
 function getSS_(create) {
+  if (SS_) return SS_;
+  SS_ = openSS_(create);
+  return SS_;
+}
+function openSS_(create) {
   const p = props_();
   const id = p.getProperty('SHEET_ID');
   if (id) {
@@ -881,9 +887,10 @@ const ACTIONS = {
 
   sync: function (b) {
     const since = String(b.since || '');
-    const docs = readTab_('Documents').rows.filter(function (r) { return !since || r.Updated > since || r.Updated === ''; }).map(docFromRow_);
+    const rows = readTab_('Documents').rows;
+    const docs = rows.filter(function (r) { return !since || r.Updated > since || r.Updated === ''; }).map(docFromRow_);
     const deleted = readTab_('_Deleted').rows.filter(function (r) { return !r.Restored && (!since || r.DeletedAt > since); }).map(function (r) { return r.ID; });
-    const all = since ? readTab_('Documents').rows.map(function (r) { return r.ID; }) : null;
+    const all = since ? rows.map(function (r) { return r.ID; }) : null;
     return Object.assign({ docs: docs, deleted: deleted, allIds: all, full: !since, meta: meta_() }, lists_());
   },
 

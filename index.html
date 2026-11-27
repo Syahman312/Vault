@@ -88,6 +88,7 @@ nav.tabs .badge{position:absolute;top:8px;left:calc(50% + 6px);background:var(--
 .section > .hd h2{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .list{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line);width:100%;text-align:left;min-height:60px}
+.list > .item:nth-child(n+16){content-visibility:auto;contain-intrinsic-size:auto 64px}
 .item:first-child{border-top:0}
 .item:active{background:var(--card2)}
 .item .t{font-weight:560}
@@ -379,7 +380,7 @@ body.dragging .drop{display:block;border-color:var(--accent);color:var(--accent)
    7 browse · 8 document · 9 expiring · 10 add/edit/renew · 11 scan/pdf
    12 viewer · 13 settings · 14 lock · 15 linked apps · 16 boot
    ========================================================================== */
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.5.1';
 
 /* ============================== 1. utils ============================== */
 const $ = (s, r = document) => r.querySelector(s);
